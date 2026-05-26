@@ -1,0 +1,85 @@
+{
+  "appPolicies" : {
+    "eula" : "",
+    "policies" : [
+      {
+        "locale" : "en_US",
+        "policyText" : "",
+        "policyURL" : ""
+      }
+    ]
+  },
+  "identifier" : "D6E11E92",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+
+  ],
+  "settings" : {
+    "_applicationInternalID" : "6768628885",
+    "_askToBuyEnabled" : false,
+    "_billingGracePeriodEnabled" : false,
+    "_billingIssuesEnabled" : false,
+    "_developerTeamID" : "Z8468NWX63",
+    "_disableDialogs" : false,
+    "_failTransactionsEnabled" : false,
+    "_lastSynchronizedDate" : 800459050.36159301,
+    "_locale" : "ko",
+    "_renewalBillingIssuesEnabled" : false,
+    "_storefront" : "KOR",
+    "_storeKitErrors" : [
+
+    ],
+    "_timeRate" : 0
+  },
+  "subscriptionGroups" : [
+    {
+      "id" : "22088926",
+      "localizations" : [
+        {
+          "description" : "",
+          "displayName" : "내근무 월간구독",
+          "locale" : "ko"
+        }
+      ],
+      "name" : "Sub",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "2200",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "6769385403",
+          "introductoryOffers" : [
+
+          ],
+          "localizations" : [
+            {
+              "description" : "모든 프리미엄 기능을 1개월간 사용가능합니다.",
+              "displayName" : "내근무 월간구독",
+              "locale" : "ko"
+            }
+          ],
+          "productID" : "SubMonthly",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "Monthly",
+          "subscriptionGroupID" : "22088926",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
+        }
+      ]
+    }
+  ],
+  "version" : {
+    "major" : 5,
+    "minor" : 0
+  }
+}

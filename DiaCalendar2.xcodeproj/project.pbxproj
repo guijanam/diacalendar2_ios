@@ -1,0 +1,464 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		4E5B10AD2FB495CA00DB378E /* SplashScreenKit in Frameworks */ = {isa = PBXBuildFile; productRef = 4E5B10AC2FB495CA00DB378E /* SplashScreenKit */; };
+		4E5B10B02FB495FD00DB378E /* SwiftNEW in Frameworks */ = {isa = PBXBuildFile; productRef = 4E5B10AF2FB495FD00DB378E /* SwiftNEW */; };
+		4E5B11A42FB581DF00DB378E /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = 4E5B11A32FB581DF00DB378E /* RevenueCat */; };
+		4E5B11A62FB581DF00DB378E /* RevenueCatUI in Frameworks */ = {isa = PBXBuildFile; productRef = 4E5B11A52FB581DF00DB378E /* RevenueCatUI */; };
+		4E7737EE2FAE9E0E004F74E8 /* Yotei in Frameworks */ = {isa = PBXBuildFile; productRef = 4E7737ED2FAE9E0E004F74E8 /* Yotei */; };
+		4ECB8D0D2FB66FA200FA2BD5 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4ECB8D0C2FB66FA200FA2BD5 /* StoreKit.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		4E7737632FAE0C42004F74E8 /* DiaCalendar2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DiaCalendar2.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4ECB8D0C2FB66FA200FA2BD5 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		4E62BD1B2FB2FBEE00499B6A /* Exceptions for "DiaCalendar2" folder in "DiaCalendar2" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 4E7737622FAE0C42004F74E8 /* DiaCalendar2 */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		4E7737652FAE0C42004F74E8 /* DiaCalendar2 */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				4E62BD1B2FB2FBEE00499B6A /* Exceptions for "DiaCalendar2" folder in "DiaCalendar2" target */,
+			);
+			path = DiaCalendar2;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		4E7737602FAE0C42004F74E8 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4E5B11A42FB581DF00DB378E /* RevenueCat in Frameworks */,
+				4E5B10AD2FB495CA00DB378E /* SplashScreenKit in Frameworks */,
+				4E5B10B02FB495FD00DB378E /* SwiftNEW in Frameworks */,
+				4ECB8D0D2FB66FA200FA2BD5 /* StoreKit.framework in Frameworks */,
+				4E5B11A62FB581DF00DB378E /* RevenueCatUI in Frameworks */,
+				4E7737EE2FAE9E0E004F74E8 /* Yotei in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		4E77375A2FAE0C42004F74E8 = {
+			isa = PBXGroup;
+			children = (
+				4E7737652FAE0C42004F74E8 /* DiaCalendar2 */,
+				4ECB8D0B2FB66FA200FA2BD5 /* Frameworks */,
+				4E7737642FAE0C42004F74E8 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		4E7737642FAE0C42004F74E8 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				4E7737632FAE0C42004F74E8 /* DiaCalendar2.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		4ECB8D0B2FB66FA200FA2BD5 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				4ECB8D0C2FB66FA200FA2BD5 /* StoreKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		4E7737622FAE0C42004F74E8 /* DiaCalendar2 */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4E77376E2FAE0C44004F74E8 /* Build configuration list for PBXNativeTarget "DiaCalendar2" */;
+			buildPhases = (
+				4E77375F2FAE0C42004F74E8 /* Sources */,
+				4E7737602FAE0C42004F74E8 /* Frameworks */,
+				4E7737612FAE0C42004F74E8 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				4E7737652FAE0C42004F74E8 /* DiaCalendar2 */,
+			);
+			name = DiaCalendar2;
+			packageProductDependencies = (
+				4E7737ED2FAE9E0E004F74E8 /* Yotei */,
+				4E5B10AC2FB495CA00DB378E /* SplashScreenKit */,
+				4E5B10AF2FB495FD00DB378E /* SwiftNEW */,
+				4E5B11A32FB581DF00DB378E /* RevenueCat */,
+				4E5B11A52FB581DF00DB378E /* RevenueCatUI */,
+			);
+			productName = DiaCalendar2;
+			productReference = 4E7737632FAE0C42004F74E8 /* DiaCalendar2.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		4E77375B2FAE0C42004F74E8 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2640;
+				LastUpgradeCheck = 2640;
+				TargetAttributes = {
+					4E7737622FAE0C42004F74E8 = {
+						CreatedOnToolsVersion = 26.4.1;
+					};
+				};
+			};
+			buildConfigurationList = 4E77375E2FAE0C42004F74E8 /* Build configuration list for PBXProject "DiaCalendar2" */;
+			developmentRegion = ko;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+				ko,
+			);
+			mainGroup = 4E77375A2FAE0C42004F74E8;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				4E7737EC2FAE9E0E004F74E8 /* XCRemoteSwiftPackageReference "Yotei" */,
+				4E5B10AB2FB495CA00DB378E /* XCRemoteSwiftPackageReference "19-Splash-Screen-for-SwiftUI" */,
+				4E5B10AE2FB495FD00DB378E /* XCRemoteSwiftPackageReference "SwiftNEWKit" */,
+				4E5B11A22FB581DF00DB378E /* XCRemoteSwiftPackageReference "purchases-ios-spm" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 4E7737642FAE0C42004F74E8 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				4E7737622FAE0C42004F74E8 /* DiaCalendar2 */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		4E7737612FAE0C42004F74E8 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		4E77375F2FAE0C42004F74E8 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		4E77376C2FAE0C44004F74E8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = Z8468NWX63;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.4;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		4E77376D2FAE0C44004F74E8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = Z8468NWX63;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.4;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		4E77376F2FAE0C44004F74E8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = Logo;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 8;
+				DEVELOPMENT_TEAM = Z8468NWX63;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = DiaCalendar2/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "내근무";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "일정을 시스템 캘린더와 동기화하기 위해 접근 권한이 필요합니다.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.5;
+				PRODUCT_BUNDLE_IDENTIFIER = com.developergui7.DiaCalendar2;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		4E7737702FAE0C44004F74E8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = Logo;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 8;
+				DEVELOPMENT_TEAM = Z8468NWX63;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = DiaCalendar2/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "내근무";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "일정을 시스템 캘린더와 동기화하기 위해 접근 권한이 필요합니다.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.5;
+				PRODUCT_BUNDLE_IDENTIFIER = com.developergui7.DiaCalendar2;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		4E77375E2FAE0C42004F74E8 /* Build configuration list for PBXProject "DiaCalendar2" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4E77376C2FAE0C44004F74E8 /* Debug */,
+				4E77376D2FAE0C44004F74E8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4E77376E2FAE0C44004F74E8 /* Build configuration list for PBXNativeTarget "DiaCalendar2" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4E77376F2FAE0C44004F74E8 /* Debug */,
+				4E7737702FAE0C44004F74E8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		4E5B10AB2FB495CA00DB378E /* XCRemoteSwiftPackageReference "19-Splash-Screen-for-SwiftUI" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/1998code/19-Splash-Screen-for-SwiftUI";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.2.3;
+			};
+		};
+		4E5B10AE2FB495FD00DB378E /* XCRemoteSwiftPackageReference "SwiftNEWKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/1998code/SwiftNEWKit";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 6.3.0;
+			};
+		};
+		4E5B11A22FB581DF00DB378E /* XCRemoteSwiftPackageReference "purchases-ios-spm" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/RevenueCat/purchases-ios-spm.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.73.0;
+			};
+		};
+		4E7737EC2FAE9E0E004F74E8 /* XCRemoteSwiftPackageReference "Yotei" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/claustrofob/Yotei.git";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		4E5B10AC2FB495CA00DB378E /* SplashScreenKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4E5B10AB2FB495CA00DB378E /* XCRemoteSwiftPackageReference "19-Splash-Screen-for-SwiftUI" */;
+			productName = SplashScreenKit;
+		};
+		4E5B10AF2FB495FD00DB378E /* SwiftNEW */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4E5B10AE2FB495FD00DB378E /* XCRemoteSwiftPackageReference "SwiftNEWKit" */;
+			productName = SwiftNEW;
+		};
+		4E5B11A32FB581DF00DB378E /* RevenueCat */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4E5B11A22FB581DF00DB378E /* XCRemoteSwiftPackageReference "purchases-ios-spm" */;
+			productName = RevenueCat;
+		};
+		4E5B11A52FB581DF00DB378E /* RevenueCatUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4E5B11A22FB581DF00DB378E /* XCRemoteSwiftPackageReference "purchases-ios-spm" */;
+			productName = RevenueCatUI;
+		};
+		4E7737ED2FAE9E0E004F74E8 /* Yotei */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4E7737EC2FAE9E0E004F74E8 /* XCRemoteSwiftPackageReference "Yotei" */;
+			productName = Yotei;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 4E77375B2FAE0C42004F74E8 /* Project object */;
+}

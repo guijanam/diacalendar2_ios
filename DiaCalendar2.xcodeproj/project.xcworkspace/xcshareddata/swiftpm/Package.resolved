@@ -1,0 +1,78 @@
+{
+  "originHash" : "a9c4923d8a2ef26c216e1d9114ef386b477524e4a7fc86cef293b5aa09b925b5",
+  "pins" : [
+    {
+      "identity" : "19-splash-screen-for-swiftui",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/1998code/19-Splash-Screen-for-SwiftUI",
+      "state" : {
+        "revision" : "8e4b35d025b45800b1db2de778220ede9814a796",
+        "version" : "2.2.3"
+      }
+    },
+    {
+      "identity" : "drops",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/omaralbeik/Drops.git",
+      "state" : {
+        "revision" : "a183ee6f79f21c940092a19c2cba756555422371",
+        "version" : "1.7.0"
+      }
+    },
+    {
+      "identity" : "eventually",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/claustrofob/Eventually.git",
+      "state" : {
+        "branch" : "1.0.4",
+        "revision" : "c6bb7ac7e0ad672d034304ff667116a8c2be64e1"
+      }
+    },
+    {
+      "identity" : "purchases-ios-spm",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/RevenueCat/purchases-ios-spm.git",
+      "state" : {
+        "revision" : "6b95744e70f1edc43f89f2b522b0832ddfdd41a1",
+        "version" : "5.73.0"
+      }
+    },
+    {
+      "identity" : "swiftglass",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/1998code/SwiftGlass.git",
+      "state" : {
+        "revision" : "b11729993a2f4a4f11d17ee833ec05b2140400c5",
+        "version" : "26.0.1"
+      }
+    },
+    {
+      "identity" : "swiftnewkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/1998code/SwiftNEWKit",
+      "state" : {
+        "revision" : "333f74f2d6861ac021b3e05c5f8059bc420bf5c1",
+        "version" : "6.3.0"
+      }
+    },
+    {
+      "identity" : "swiftvbkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/1998code/SwiftVBKit.git",
+      "state" : {
+        "revision" : "efd706f9b2522cb8f08c75a012c3c5478757379c",
+        "version" : "1.4.0"
+      }
+    },
+    {
+      "identity" : "yotei",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/claustrofob/Yotei.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "6dd5c5ea9f97def4402e894b944da869beeda78f"
+      }
+    }
+  ],
+  "version" : 3
+}
