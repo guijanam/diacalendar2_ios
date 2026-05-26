@@ -254,34 +254,32 @@ struct SettingsView: View {
                         }
                     }
 
-                    if appEnvironment.revenueCatService.isVIP {
-                        Button {
-                            guard !isVIPRefreshing else { return }
-                            isVIPRefreshing = true
+                    Button {
+                        guard !isVIPRefreshing else { return }
+                        isVIPRefreshing = true
+                        vipRefreshResult = nil
+                        Task {
+                            await appEnvironment.revenueCatService.refreshVIP()
+                            vipRefreshResult = appEnvironment.revenueCatService.isVIP
+                            isVIPRefreshing = false
+                            try? await Task.sleep(nanoseconds: 3_000_000_000)
                             vipRefreshResult = nil
-                            Task {
-                                await appEnvironment.revenueCatService.refreshVIP()
-                                vipRefreshResult = appEnvironment.revenueCatService.isVIP
-                                isVIPRefreshing = false
-                                try? await Task.sleep(nanoseconds: 3_000_000_000)
-                                vipRefreshResult = nil
-                            }
-                        } label: {
-                            HStack {
-                                Text("VIP 상태 갱신")
-                                    .foregroundStyle(.primary)
-                                Spacer()
-                                if isVIPRefreshing {
-                                    ProgressView()
-                                } else if let result = vipRefreshResult {
-                                    Label(result ? "VIP 확인됨" : "VIP 아님",
-                                          systemImage: result ? "checkmark.seal.fill" : "xmark.seal")
-                                        .font(.caption)
-                                        .foregroundStyle(result ? .green : .red)
-                                } else {
-                                    Image(systemName: "arrow.clockwise")
-                                        .foregroundStyle(.accentColor)
-                                }
+                        }
+                    } label: {
+                        HStack {
+                            Text("VIP 상태 갱신")
+                                .foregroundStyle(.primary)
+                            Spacer()
+                            if isVIPRefreshing {
+                                ProgressView()
+                            } else if let result = vipRefreshResult {
+                                Label(result ? "VIP 확인됨" : "VIP 아님",
+                                      systemImage: result ? "checkmark.seal.fill" : "xmark.seal")
+                                    .font(.caption)
+                                    .foregroundStyle(result ? .green : .red)
+                            } else {
+                                Image(systemName: "arrow.clockwise")
+                                    .foregroundStyle(Color.accentColor)
                             }
                         }
                     }
