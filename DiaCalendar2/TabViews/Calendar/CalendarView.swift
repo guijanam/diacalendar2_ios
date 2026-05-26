@@ -78,6 +78,7 @@ struct FullCalendarView: View {
 
     @State private var contentOffset: CGPoint?
     @State private var pendingSheet: CalendarSheet?
+    @State private var isMonthPickerPresented: Bool = false
 
     var body: some View {
         VStack {
@@ -293,7 +294,7 @@ struct FullCalendarView: View {
         }
     }
 
-    /// 상단 월 표시 + 오른쪽에 그 달의 총 휴무 갯수 배지.
+    /// 상단 월 표시 + 오른쪽에 그 달의 총 휴무 갯수 배지. 탭하면 년/월 선택 시트.
     @ViewBuilder
     private var monthTitle: some View {
         let monthText = viewModel.calendar.isDate(
@@ -311,20 +312,39 @@ struct FullCalendarView: View {
             ).month().year(.defaultDigits))
 
         let restColor = Color(hex: ShiftDayInfo.attendanceColorHex) ?? .red
-        // 휴무충당 색상 (ShiftInputDefaults 의 휴무충당과 동일한 보라).
         let hyumuColor = Color(hex: "#9C27B0") ?? .purple
 
-        HStack(spacing: 6) {
-            Text(monthText)
-                .font(.headline)
-                .lineLimit(1)
-            countBadge(text: "휴 \(viewModel.monthRestCount)", color: restColor)
-            if viewModel.monthHyumuChungdangCount > 0 {
-                countBadge(text: "\(viewModel.monthHyumuChungdangCount)", color: hyumuColor)
+        Button {
+            isMonthPickerPresented = true
+        } label: {
+            HStack(spacing: 6) {
+                HStack(spacing: 2) {
+                    Text(monthText)
+                        .font(.headline)
+                        .lineLimit(1)
+                    Image(systemName: "chevron.down")
+                        .font(.caption)
+                        .fontWeight(.semibold)
+                }
+                .foregroundStyle(.primary)
+                countBadge(text: "휴 \(viewModel.monthRestCount)", color: restColor)
+                if viewModel.monthHyumuChungdangCount > 0 {
+                    countBadge(text: "\(viewModel.monthHyumuChungdangCount)", color: hyumuColor)
+                }
             }
+            // principal 슬롯이 콘텐츠를 좁혀 "..." 로 잘리는 것을 방지: 자연 크기 유지.
+            .fixedSize(horizontal: true, vertical: false)
         }
-        // principal 슬롯이 콘텐츠를 좁혀 "..." 로 잘리는 것을 방지: 자연 크기 유지.
-        .fixedSize(horizontal: true, vertical: false)
+        .sheet(isPresented: $isMonthPickerPresented) {
+            MonthYearPickerSheet(
+                calendar: viewModel.calendar,
+                selected: viewModel.focusedDate
+            ) { date in
+                viewModel.focusedDate = date
+            }
+            .presentationDetents([.medium])
+            .presentationDragIndicator(.visible)
+        }
     }
 
     /// 월 표시 옆 갯수 배지 (휴 / 휴무충당 공통).
