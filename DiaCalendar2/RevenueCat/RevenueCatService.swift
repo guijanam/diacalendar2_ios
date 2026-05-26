@@ -59,15 +59,47 @@ final class RevenueCatService {
 
     // MARK: - VIP (평생 무료) Check
 
+    private static let vipCacheKey = "rc_vip_status"
+    private static let vipCacheTimestampKey = "rc_vip_status_timestamp"
+    private static let vipCacheTTL: TimeInterval = 7 * 24 * 60 * 60 // 1주일
+
     /// Supabase `coworker_list.device_id`에 현재 기기 ID가 등록되어 있는지 확인.
-    /// 등록되어 있으면 RevenueCat 구독자와 동일하게 페이월을 우회한다.
+    /// 캐시가 유효하면 서버 호출 없이 캐시값을 사용한다. TTL = 1주일.
     func checkVIP() async {
+        if let cached = loadVIPCache() {
+            isVIP = cached
+            return
+        }
+        await fetchVIPFromServer()
+    }
+
+    /// 캐시를 무시하고 서버에서 강제로 VIP 상태를 갱신한다.
+    func refreshVIP() async {
+        await fetchVIPFromServer()
+    }
+
+    private func fetchVIPFromServer() async {
         guard let deviceId = UIDevice.current.identifierForVendor?.uuidString else { return }
         do {
-            isVIP = try await SupabaseAPI.isRegisteredDevice(deviceId)
+            let result = try await SupabaseAPI.isRegisteredDevice(deviceId)
+            isVIP = result
+            saveVIPCache(result)
         } catch {
             // 네트워크 실패 시 기존 상태 유지
         }
+    }
+
+    private func loadVIPCache() -> Bool? {
+        let defaults = UserDefaults.standard
+        guard let timestamp = defaults.object(forKey: Self.vipCacheTimestampKey) as? Date else { return nil }
+        guard Date().timeIntervalSince(timestamp) < Self.vipCacheTTL else { return nil }
+        guard defaults.object(forKey: Self.vipCacheKey) != nil else { return nil }
+        return defaults.bool(forKey: Self.vipCacheKey)
+    }
+
+    private func saveVIPCache(_ value: Bool) {
+        UserDefaults.standard.set(value, forKey: Self.vipCacheKey)
+        UserDefaults.standard.set(Date(), forKey: Self.vipCacheTimestampKey)
     }
 
     // MARK: - Restore Purchases
