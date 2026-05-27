@@ -37,7 +37,9 @@ actor AttendanceTypeRepository {
         shortName: String,
         limitCount: Int? = nil,
         resetMonth: Int? = 1,
-        resetDay: Int? = 1
+        resetDay: Int? = 1,
+        resetYear: Int? = nil,
+        resetCycleYears: Int = 1
     ) -> UUID {
         if let id, let existing = try? modelContext.fetch(FetchDescriptor(predicate: #Predicate<AttendanceType> { $0.id == id })).first {
             existing.name = name
@@ -45,6 +47,8 @@ actor AttendanceTypeRepository {
             existing.limitCount = limitCount
             existing.resetMonth = resetMonth
             existing.resetDay = resetDay
+            existing.resetYear = resetYear
+            existing.resetCycleYears = resetCycleYears
             try? modelContext.save()
             return existing.id
         }
@@ -54,7 +58,9 @@ actor AttendanceTypeRepository {
             shortName: shortName,
             limitCount: limitCount,
             resetMonth: resetMonth,
-            resetDay: resetDay
+            resetDay: resetDay,
+            resetYear: resetYear,
+            resetCycleYears: resetCycleYears
         )
         modelContext.insert(new)
         try? modelContext.save()

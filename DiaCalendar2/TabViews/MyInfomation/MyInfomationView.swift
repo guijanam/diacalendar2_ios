@@ -54,7 +54,40 @@ struct MyInfomationView: View {
     }
 
     private var filteredAttendanceRecords: [AttendanceRecordDTO] {
-        normalAttendanceRecords.filter { calendar.component(.year, from: $0.date) == selectedYear }
+        // selectedYear 마지막 날을 기준일로 삼아 그 해의 주기를 계산
+        let yearEnd = calendar.date(from: DateComponents(year: selectedYear, month: 12, day: 31)) ?? Date()
+
+        // selectedYear에 사용 기록이 있는 근태 타입 이름 수집
+        let namesInSelectedYear = Set(
+            normalAttendanceRecords
+                .filter { calendar.component(.year, from: $0.date) == selectedYear }
+                .map(\.name)
+        )
+
+        return normalAttendanceRecords.filter { record in
+            let recordYear = calendar.component(.year, from: record.date)
+
+            // selectedYear 레코드는 무조건 포함
+            if recordYear == selectedYear { return true }
+
+            // selectedYear에 사용 기록이 있고 다년 주기가 설정된 타입만 추가 포함
+            guard namesInSelectedYear.contains(record.name),
+                  let type = attendanceTypes.first(where: { $0.name == record.name }),
+                  type.resetYear != nil || type.resetCycleYears > 1
+            else { return false }
+
+            // selectedYear 기준 주기 범위 계산
+            guard let cycleStart = currentCycleStart(type: type, referenceDate: yearEnd) else { return false }
+            let cycleYears = max(1, type.resetCycleYears)
+            let startYearOfCycle = calendar.component(.year, from: cycleStart)
+            let nextResetDate = calendar.date(from: DateComponents(
+                year: startYearOfCycle + cycleYears,
+                month: type.resetMonth ?? 1,
+                day: type.resetDay ?? 1
+            )) ?? .distantFuture
+
+            return record.date >= cycleStart && record.date < nextResetDate
+        }
     }
 
     private var filteredShiftInputRecords: [ShiftInputRecordDTO] {
@@ -209,6 +242,8 @@ struct MyInfomationView: View {
     // MARK: - 근태내역
 
     private var attendanceListView: some View {
+        // 헤더 used 카운트는 초기화 주기 기준으로 합산하므로 전체 normalAttendanceRecords 사용.
+        // 개별 행 표시는 selectedYear 필터 유지.
         let grouped = Dictionary(grouping: filteredAttendanceRecords, by: \.name)
         let sortedNames = grouped.keys.sorted { a, b in
             let latestA = grouped[a]!.map(\.date).max() ?? .distantPast
@@ -222,7 +257,9 @@ struct MyInfomationView: View {
             } else {
                 List {
                     ForEach(sortedNames, id: \.self) { name in
-                        Section(header: attendanceHeader(name: name, used: (grouped[name] ?? []).count)) {
+                        let type = attendanceTypes.first(where: { $0.name == name })
+                        let used = usedCountInCurrentCycle(name: name, type: type)
+                        Section(header: attendanceHeader(name: name, used: used, type: type)) {
                             ForEach(
                                 (grouped[name] ?? []).sorted { $0.date > $1.date },
                                 id: \.id
@@ -239,9 +276,46 @@ struct MyInfomationView: View {
         }
     }
 
+    /// 주어진 referenceDate 기준으로 초기화 주기 시작일을 계산한다.
+    /// - resetYear/resetCycleYears 없음: 매년 resetMonth/resetDay 기준
+    /// - resetYear/resetCycleYears 있음: 시작일부터 N년 주기
+    private func currentCycleStart(type: AttendanceTypeDTO, referenceDate: Date = Date()) -> Date? {
+        guard let resetMonth = type.resetMonth, let resetDay = type.resetDay else { return nil }
+        let refYear = calendar.component(.year, from: referenceDate)
+
+        if let startYear = type.resetYear {
+            let cycleYears = max(1, type.resetCycleYears)
+            var cycleStart = startYear
+            while true {
+                let next = cycleStart + cycleYears
+                guard let nextDate = calendar.date(from: DateComponents(year: next, month: resetMonth, day: resetDay)),
+                      nextDate <= referenceDate else { break }
+                cycleStart = next
+            }
+            return calendar.date(from: DateComponents(year: cycleStart, month: resetMonth, day: resetDay))
+        } else {
+            if let thisYear = calendar.date(from: DateComponents(year: refYear, month: resetMonth, day: resetDay)),
+               thisYear <= referenceDate {
+                return thisYear
+            } else {
+                return calendar.date(from: DateComponents(year: refYear - 1, month: resetMonth, day: resetDay))
+            }
+        }
+    }
+
+    /// 현재 초기화 주기 내에 사용한 갯수
+    private func usedCountInCurrentCycle(name: String, type: AttendanceTypeDTO?) -> Int {
+        guard let type else {
+            return normalAttendanceRecords.filter { $0.name == name }.count
+        }
+        guard let cycleStart = currentCycleStart(type: type) else {
+            return normalAttendanceRecords.filter { $0.name == name }.count
+        }
+        return normalAttendanceRecords.filter { $0.name == name && $0.date >= cycleStart }.count
+    }
+
     @ViewBuilder
-    private func attendanceHeader(name: String, used: Int) -> some View {
-        let type = attendanceTypes.first(where: { $0.name == name })
+    private func attendanceHeader(name: String, used: Int, type: AttendanceTypeDTO?) -> some View {
         let limit = type.flatMap { $0.limitCount.flatMap { $0 > 0 ? $0 : nil } }
         let isExhausted = limit.map { used >= $0 } ?? false
         let label = limit.map { "\(name) (\(used)/\($0))" } ?? "\(name) (\(used))"

@@ -89,7 +89,7 @@ struct AttendanceTypeListView: View {
         }
         .sheet(item: $editorRoute) { route in
             NavigationStack {
-                AttendanceTypeEditView(initial: route.initial) { name, shortName, limit, month, day in
+                AttendanceTypeEditView(initial: route.initial) { name, shortName, limit, month, day, year, cycleYears in
                     let id = route.initial?.id
                     Task {
                         _ = await env.attendanceTypeRepository.upsert(
@@ -98,7 +98,9 @@ struct AttendanceTypeListView: View {
                             shortName: shortName,
                             limitCount: limit,
                             resetMonth: month,
-                            resetDay: day
+                            resetDay: day,
+                            resetYear: year,
+                            resetCycleYears: cycleYears
                         )
                         await reload()
                     }
@@ -117,7 +119,8 @@ struct AttendanceTypeEditView: View {
     @Environment(\.dismiss) private var dismiss
     let initial: AttendanceTypeDTO?
     let onSave: (_ name: String, _ shortName: String,
-                 _ limitCount: Int?, _ resetMonth: Int?, _ resetDay: Int?) -> Void
+                 _ limitCount: Int?, _ resetMonth: Int?, _ resetDay: Int?,
+                 _ resetYear: Int?, _ resetCycleYears: Int) -> Void
 
     @State private var name: String = ""
     @State private var shortName: String = ""
@@ -126,6 +129,12 @@ struct AttendanceTypeEditView: View {
     @State private var resetEnabled: Bool = true
     @State private var resetMonth: Int = 1
     @State private var resetDay: Int = 1
+    @State private var yearEnabled: Bool = false
+    @State private var resetYear: Int = Calendar.current.component(.year, from: Date())
+    @State private var resetCycleYears: Int = 1
+
+    private let currentYear = Calendar.current.component(.year, from: Date())
+    private var yearRange: [Int] { Array((currentYear - 10)...(currentYear + 10)) }
 
     private var canSave: Bool {
         !name.trimmingCharacters(in: .whitespaces).isEmpty &&
@@ -159,6 +168,16 @@ struct AttendanceTypeEditView: View {
             Section {
                 Toggle("주기별 초기화", isOn: $resetEnabled)
                 if resetEnabled {
+                    Toggle("시작 년도 지정", isOn: $yearEnabled)
+                    if yearEnabled {
+                        Picker("시작 년도", selection: $resetYear) {
+                            ForEach(yearRange, id: \.self) { year in
+                                Text(String(format: "%d년", year)).tag(year)
+                            }
+                        }
+                        Stepper(resetCycleYears == 1 ? "매년 초기화" : "\(resetCycleYears)년마다 초기화",
+                                value: $resetCycleYears, in: 1...20)
+                    }
                     Picker("월", selection: $resetMonth) {
                         ForEach(1...12, id: \.self) { Text("\($0)월").tag($0) }
                     }
@@ -169,7 +188,11 @@ struct AttendanceTypeEditView: View {
             } header: {
                 Text("초기화 날짜")
             } footer: {
-                Text("기본값은 매년 1월 1일입니다. 회계연도 등 다른 기준일을 쓰는 경우 변경하세요.")
+                if resetEnabled && yearEnabled {
+                    Text("시작 년도와 주기를 지정하면 해당 년도의 월/일부터 N년마다 초기화됩니다.")
+                } else {
+                    Text("기본값은 매년 1월 1일입니다. 회계연도 등 다른 기준일을 쓰는 경우 변경하세요.")
+                }
             }
         }
         .navigationTitle(initial == nil ? "새 휴가 종류" : "휴가 종류 편집")
@@ -185,7 +208,9 @@ struct AttendanceTypeEditView: View {
                         shortName.trimmingCharacters(in: .whitespaces),
                         limitEnabled ? limitCount : nil,
                         resetEnabled ? resetMonth : nil,
-                        resetEnabled ? resetDay : nil
+                        resetEnabled ? resetDay : nil,
+                        (resetEnabled && yearEnabled) ? resetYear : nil,
+                        (resetEnabled && yearEnabled) ? resetCycleYears : 1
                     )
                     dismiss()
                 }
@@ -211,12 +236,16 @@ struct AttendanceTypeEditView: View {
                 } else {
                     resetEnabled = false
                 }
+                if let y = initial.resetYear {
+                    yearEnabled = true
+                    resetYear = y
+                    resetCycleYears = initial.resetCycleYears
+                }
             }
         }
     }
 
     private func maxDay(month: Int) -> Int {
-        // 윤년 영향을 받지 않게 평년 기준 (2월 28일까지).
         switch month {
         case 1, 3, 5, 7, 8, 10, 12: return 31
         case 4, 6, 9, 11: return 30

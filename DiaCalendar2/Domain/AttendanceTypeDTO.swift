@@ -10,9 +10,11 @@ struct AttendanceTypeDTO: Sendable, Hashable, Identifiable {
     var name: String
     var shortName: String
     var createdAt: Date
-    var limitCount: Int? = nil   // nil 또는 0 = 무제한
-    var resetMonth: Int? = 1     // 기본 1월
-    var resetDay: Int? = 1       // 기본 1일
+    var limitCount: Int? = nil      // nil 또는 0 = 무제한
+    var resetMonth: Int? = 1        // 기본 1월
+    var resetDay: Int? = 1          // 기본 1일
+    var resetYear: Int? = nil       // nil = 매년, 값 있으면 시작 년도
+    var resetCycleYears: Int = 1    // N년마다 초기화 (기본 매년)
 }
 
 /// 첫 부팅 시 시드. 사용자가 자유롭게 편집/삭제 가능.

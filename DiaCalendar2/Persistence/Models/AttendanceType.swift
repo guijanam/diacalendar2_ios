@@ -18,6 +18,8 @@ final class AttendanceType {
     var limitCount: Int? = nil   // nil 또는 0 = 무제한
     var resetMonth: Int? = 1     // 기본 1월
     var resetDay: Int? = 1       // 기본 1일
+    var resetYear: Int? = nil    // nil = 매년, 값 있으면 시작 년도
+    var resetCycleYears: Int = 1 // N년마다 초기화 (기본 매년)
 
     init(
         id: UUID = UUID(),
@@ -26,7 +28,9 @@ final class AttendanceType {
         createdAt: Date = Date(),
         limitCount: Int? = nil,
         resetMonth: Int? = 1,
-        resetDay: Int? = 1
+        resetDay: Int? = 1,
+        resetYear: Int? = nil,
+        resetCycleYears: Int = 1
     ) {
         self.id = id
         self.name = name
@@ -35,6 +39,8 @@ final class AttendanceType {
         self.limitCount = limitCount
         self.resetMonth = resetMonth
         self.resetDay = resetDay
+        self.resetYear = resetYear
+        self.resetCycleYears = resetCycleYears
     }
 
     func toDTO() -> AttendanceTypeDTO {
@@ -45,7 +51,9 @@ final class AttendanceType {
             createdAt: createdAt,
             limitCount: limitCount,
             resetMonth: resetMonth,
-            resetDay: resetDay
+            resetDay: resetDay,
+            resetYear: resetYear,
+            resetCycleYears: resetCycleYears
         )
     }
 }
