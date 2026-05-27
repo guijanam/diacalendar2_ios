@@ -65,6 +65,7 @@ final class FullCalendarViewModelModel: ObservableObject {
     private let holidayRepository: HolidayRepository?
     private let dateMemoRepository: DateMemoRepository?
     private let syncStateRepository: SyncStateRepository?
+    private let lunarAnniversaryRepository: LunarAnniversaryRepository?
     private let aggregator = CalendarAggregator()
 
     private var monthInterval: DateInterval?
@@ -110,7 +111,8 @@ final class FullCalendarViewModelModel: ObservableObject {
         diaRecordRepository: DiaRecordRepository? = nil,
         holidayRepository: HolidayRepository? = nil,
         dateMemoRepository: DateMemoRepository? = nil,
-        syncStateRepository: SyncStateRepository? = nil
+        syncStateRepository: SyncStateRepository? = nil,
+        lunarAnniversaryRepository: LunarAnniversaryRepository? = nil
     ) {
         self.eventKitService = eventKitService
         self.localNotificationService = localNotificationService
@@ -127,6 +129,7 @@ final class FullCalendarViewModelModel: ObservableObject {
         self.holidayRepository = holidayRepository
         self.dateMemoRepository = dateMemoRepository
         self.syncStateRepository = syncStateRepository
+        self.lunarAnniversaryRepository = lunarAnniversaryRepository
         if let seoulTimeZone = TimeZone(identifier: "Asia/Seoul") {
             calendar.timeZone = seoulTimeZone
         }
@@ -254,6 +257,7 @@ extension FullCalendarViewModelModel {
         let memos = dateMemoRepository
         let syncState = syncStateRepository
         let userConfig = userShiftConfigRepository
+        let lunarRepo = lunarAnniversaryRepository
         let officeRepo = officeRecordRepository
 
         Task {
@@ -267,6 +271,7 @@ extension FullCalendarViewModelModel {
             async let inputsTask: [ShiftInputRecordDTO] = shiftInputs?.records(in: dateInterval) ?? []
             async let attendancesTask: [AttendanceRecordDTO] = attendances?.records(in: dateInterval) ?? []
             async let memosTask: [DateMemoDTO] = memos?.memos(in: dateInterval) ?? []
+            async let lunarAnniversariesTask: [LunarAnniversaryDTO] = lunarRepo?.all() ?? []
             async let inputTypesTask: [ShiftInputTypeDTO] = shiftInputTypes?.all() ?? []
             async let diaTurns3Task: Set<String> = {
                 guard let config = await userConfig?.load(),
@@ -291,6 +296,7 @@ extension FullCalendarViewModelModel {
             let inputs = await inputsTask
             let attendanceList = await attendancesTask
             let memosResult = await memosTask
+            let lunarAnniversaries = await lunarAnniversariesTask
             let diaTurns3Set = await diaTurns3Task
             let inputTypes = await inputTypesTask
 
@@ -301,6 +307,7 @@ extension FullCalendarViewModelModel {
                 inputs: inputs,
                 attendances: attendanceList,
                 memos: memosResult,
+                lunarAnniversaries: lunarAnniversaries,
                 in: dateInterval,
                 calendar: calendar,
                 ekCalendarColors: colorMap
@@ -810,6 +817,22 @@ extension FullCalendarViewModelModel {
         guard let dateMemoRepository else { return }
         _ = await dateMemoRepository.upsert(dto)
         reloadEvents()
+    }
+
+    func saveLunarAnniversary(_ dto: LunarAnniversaryDTO) async {
+        guard let lunarAnniversaryRepository else { return }
+        _ = await lunarAnniversaryRepository.upsert(dto)
+        reloadEvents()
+    }
+
+    func deleteLunarAnniversary(id: UUID) async {
+        guard let lunarAnniversaryRepository else { return }
+        await lunarAnniversaryRepository.delete(id: id)
+        reloadEvents()
+    }
+
+    func allLunarAnniversaries() async -> [LunarAnniversaryDTO] {
+        await lunarAnniversaryRepository?.all() ?? []
     }
 
     func loadAvailableCalendars() async -> [EKCalendarInfo] {

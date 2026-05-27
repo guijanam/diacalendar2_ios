@@ -12,6 +12,7 @@
 		4E5B11A42FB581DF00DB378E /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = 4E5B11A32FB581DF00DB378E /* RevenueCat */; };
 		4E5B11A62FB581DF00DB378E /* RevenueCatUI in Frameworks */ = {isa = PBXBuildFile; productRef = 4E5B11A52FB581DF00DB378E /* RevenueCatUI */; };
 		4E7737EE2FAE9E0E004F74E8 /* Yotei in Frameworks */ = {isa = PBXBuildFile; productRef = 4E7737ED2FAE9E0E004F74E8 /* Yotei */; };
+		4EAFD5F62FC67AA000AAD78C /* LunarSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 4EAFD5F52FC67AA000AAD78C /* LunarSwift */; };
 		4ECB8D0D2FB66FA200FA2BD5 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4ECB8D0C2FB66FA200FA2BD5 /* StoreKit.framework */; };
 /* End PBXBuildFile section */
 
@@ -50,6 +51,7 @@
 				4E5B10AD2FB495CA00DB378E /* SplashScreenKit in Frameworks */,
 				4E5B10B02FB495FD00DB378E /* SwiftNEW in Frameworks */,
 				4ECB8D0D2FB66FA200FA2BD5 /* StoreKit.framework in Frameworks */,
+				4EAFD5F62FC67AA000AAD78C /* LunarSwift in Frameworks */,
 				4E5B11A62FB581DF00DB378E /* RevenueCatUI in Frameworks */,
 				4E7737EE2FAE9E0E004F74E8 /* Yotei in Frameworks */,
 			);
@@ -108,6 +110,7 @@
 				4E5B10AF2FB495FD00DB378E /* SwiftNEW */,
 				4E5B11A32FB581DF00DB378E /* RevenueCat */,
 				4E5B11A52FB581DF00DB378E /* RevenueCatUI */,
+				4EAFD5F52FC67AA000AAD78C /* LunarSwift */,
 			);
 			productName = DiaCalendar2;
 			productReference = 4E7737632FAE0C42004F74E8 /* DiaCalendar2.app */;
@@ -143,6 +146,7 @@
 				4E5B10AB2FB495CA00DB378E /* XCRemoteSwiftPackageReference "19-Splash-Screen-for-SwiftUI" */,
 				4E5B10AE2FB495FD00DB378E /* XCRemoteSwiftPackageReference "SwiftNEWKit" */,
 				4E5B11A22FB581DF00DB378E /* XCRemoteSwiftPackageReference "purchases-ios-spm" */,
+				4EAFD5F42FC67AA000AAD78C /* XCRemoteSwiftPackageReference "lunar-swift" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 4E7737642FAE0C42004F74E8 /* Products */;
@@ -302,7 +306,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = Logo;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_TEAM = Z8468NWX63;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -319,7 +323,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.5;
+				MARKETING_VERSION = 1.6;
 				PRODUCT_BUNDLE_IDENTIFIER = com.developergui7.DiaCalendar2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -341,7 +345,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = Logo;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_TEAM = Z8468NWX63;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -358,7 +362,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.5;
+				MARKETING_VERSION = 1.6;
 				PRODUCT_BUNDLE_IDENTIFIER = com.developergui7.DiaCalendar2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -430,6 +434,14 @@
 				kind = branch;
 			};
 		};
+		4EAFD5F42FC67AA000AAD78C /* XCRemoteSwiftPackageReference "lunar-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/6tail/lunar-swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.1.8;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -457,6 +469,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 4E7737EC2FAE9E0E004F74E8 /* XCRemoteSwiftPackageReference "Yotei" */;
 			productName = Yotei;
+		};
+		4EAFD5F52FC67AA000AAD78C /* LunarSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4EAFD5F42FC67AA000AAD78C /* XCRemoteSwiftPackageReference "lunar-swift" */;
+			productName = LunarSwift;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

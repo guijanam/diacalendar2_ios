@@ -53,7 +53,8 @@ struct FullCalendarView: View {
         diaRecordRepository: DiaRecordRepository? = nil,
         holidayRepository: HolidayRepository? = nil,
         dateMemoRepository: DateMemoRepository? = nil,
-        syncStateRepository: SyncStateRepository? = nil
+        syncStateRepository: SyncStateRepository? = nil,
+        lunarAnniversaryRepository: LunarAnniversaryRepository? = nil
     ) {
         _viewModel = StateObject(
             wrappedValue: FullCalendarViewModelModel(
@@ -71,7 +72,8 @@ struct FullCalendarView: View {
                 diaRecordRepository: diaRecordRepository,
                 holidayRepository: holidayRepository,
                 dateMemoRepository: dateMemoRepository,
-                syncStateRepository: syncStateRepository
+                syncStateRepository: syncStateRepository,
+                lunarAnniversaryRepository: lunarAnniversaryRepository
             )
         )
     }
@@ -466,7 +468,10 @@ struct FullCalendarView: View {
                 },
                 createJiGeunHyu: { category, days in
                     await viewModel.createJiGeunHyu(on: date, category: category, days: days)
-                }
+                },
+                loadLunarAnniversaries: { await viewModel.allLunarAnniversaries() },
+                saveLunarAnniversary: { dto in await viewModel.saveLunarAnniversary(dto) },
+                deleteLunarAnniversary: { id in await viewModel.deleteLunarAnniversary(id: id) }
             )
             .paywallGate(.dayDetailUsageLimited)
         case .allDay(let date):

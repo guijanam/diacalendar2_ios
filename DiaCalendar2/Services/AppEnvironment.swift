@@ -52,6 +52,9 @@ final class AppEnvironment {
     // 구독 관리
     let revenueCatService: RevenueCatService
 
+    // 음력 기념일
+    let lunarAnniversaryRepository: LunarAnniversaryRepository
+
     // 로컬 알림
     let localNotificationService: LocalNotificationService
 
@@ -98,6 +101,8 @@ final class AppEnvironment {
         let rcService = RevenueCatService()
         self.revenueCatService = rcService
         rcService.configure()
+
+        self.lunarAnniversaryRepository = LunarAnniversaryRepository(modelContainer: modelContainer)
 
         self.localNotificationService = LocalNotificationService()
 

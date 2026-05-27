@@ -1,5 +1,5 @@
 {
-  "originHash" : "a9c4923d8a2ef26c216e1d9114ef386b477524e4a7fc86cef293b5aa09b925b5",
+  "originHash" : "8ca40eeb4f0f3954c8c52bd4e80f208670b6bf40af7a75d9a6d742ccaae87e80",
   "pins" : [
     {
       "identity" : "19-splash-screen-for-swiftui",
@@ -26,6 +26,15 @@
       "state" : {
         "branch" : "1.0.4",
         "revision" : "c6bb7ac7e0ad672d034304ff667116a8c2be64e1"
+      }
+    },
+    {
+      "identity" : "lunar-swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/6tail/lunar-swift.git",
+      "state" : {
+        "revision" : "a7ec0e9b29f84a5d98b09b9ffd31145f17470d56",
+        "version" : "1.1.8"
       }
     },
     {

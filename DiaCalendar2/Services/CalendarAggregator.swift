@@ -26,6 +26,7 @@ struct CalendarAggregator: Sendable {
         inputs: [ShiftInputRecordDTO] = [],
         attendances: [AttendanceRecordDTO] = [],
         memos: [DateMemoDTO] = [],
+        lunarAnniversaries: [LunarAnniversaryDTO] = [],
         in interval: DateInterval,
         calendar: Calendar,
         ekCalendarColors: [String: String] = [:]
@@ -235,6 +236,29 @@ struct CalendarAggregator: Sendable {
                         shiftCode: nil,
                         ekCalendarIdentifier: nil,
                         isDone: memo.isDone
+                    )
+                )
+                distribute(event: yoteiEvent, into: &bucket, calendar: calendar)
+            }
+        }
+
+        for anniversary in lunarAnniversaries {
+            let occurrences = LunarSolarConverter.solarDates(for: anniversary, in: interval, calendar: calendar)
+            for occurrenceDate in occurrences {
+                let comps = calendar.dateComponents([.year, .month, .day], from: occurrenceDate)
+                guard let utcStart = utcCalendar.date(from: comps),
+                      let utcEnd = utcCalendar.date(byAdding: .day, value: 1, to: utcStart) else { continue }
+                let year = calendar.component(.year, from: occurrenceDate)
+                let yoteiEvent = YoteiEvent(
+                    id: "lunar-\(anniversary.id.uuidString)-\(year)",
+                    title: anniversary.title,
+                    start: utcStart,
+                    end: utcEnd,
+                    isAllDay: true,
+                    data: EventData(
+                        kind: .lunarAnniversary,
+                        originId: anniversary.id.uuidString,
+                        colorHex: anniversary.colorHex
                     )
                 )
                 distribute(event: yoteiEvent, into: &bucket, calendar: calendar)

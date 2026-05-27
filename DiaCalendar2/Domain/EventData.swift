@@ -12,6 +12,7 @@ nonisolated struct EventData: Equatable, Sendable {
         case event
         case shift
         case memo
+        case lunarAnniversary
     }
 
     var kind: Kind

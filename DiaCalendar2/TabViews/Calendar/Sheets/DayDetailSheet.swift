@@ -37,12 +37,16 @@ struct DayDetailSheet: View {
     let createAttendance: (_ type: AttendanceTypeDTO, _ days: Int) async -> Void
     /// 지근/지휴 등록. 근태와 동일한 흐름이지만 분류(category)를 함께 저장한다.
     let createJiGeunHyu: (_ category: AttendanceCategory, _ days: Int) async -> Void
+    let loadLunarAnniversaries: () async -> [LunarAnniversaryDTO]
+    let saveLunarAnniversary: (LunarAnniversaryDTO) async -> Void
+    let deleteLunarAnniversary: (UUID) async -> Void
 
     private enum DayChildSheet: Identifiable {
         case memoEditor(MemoEditorMode)
         case shiftSwap
         case shiftInput
         case attendance
+        case lunarAnniversaryEditor(LunarAnniversaryEditorMode)
 
         var id: String {
             switch self {
@@ -51,6 +55,8 @@ struct DayDetailSheet: View {
             case .shiftSwap: return "shiftSwap"
             case .shiftInput: return "shiftInput"
             case .attendance: return "attendance"
+            case .lunarAnniversaryEditor(.new(let m, let d)): return "lunar-new-\(m)-\(d)"
+            case .lunarAnniversaryEditor(.edit(let dto)): return "lunar-edit-\(dto.id.uuidString)"
             }
         }
     }
@@ -58,6 +64,7 @@ struct DayDetailSheet: View {
     @State private var childSheet: DayChildSheet?
 
     @State private var memos: [DateMemoDTO] = []
+    @State private var lunarAnniversaries: [LunarAnniversaryDTO] = []
     @State private var swipedMemoID: UUID?
     @State private var draggingMemoID: UUID?
     @State private var dragOffsetX: CGFloat = 0
@@ -93,9 +100,25 @@ struct DayDetailSheet: View {
                         }
 
                         VStack(alignment: .leading, spacing: 8) {
+                            sectionHeader("음력 기념일")
+                            if lunarAnniversaries.isEmpty {
+                                emptyPlaceholder("음력 기념일 없음")
+                            } else {
+                                VStack(spacing: 10) {
+                                    ForEach(lunarAnniversaries, id: \.id) { anniversary in
+                                        lunarAnniversaryCard(for: anniversary)
+                                    }
+                                }
+                            }
+                        }
+
+                        VStack(alignment: .leading, spacing: 8) {
                             sectionHeader("이벤트")
                             // 근무 정보는 위 "근무" GroupBox 에서 이미 표시하므로 이벤트 섹션에서는 제외.
-                            let nonMemoEvents = events.filter { $0.data.kind != .memo && $0.data.kind != .shift }
+                            // 음력 기념일도 전용 섹션에서 표시하므로 제외.
+                            let nonMemoEvents = events.filter {
+                                $0.data.kind != .memo && $0.data.kind != .shift && $0.data.kind != .lunarAnniversary
+                            }
                             if nonMemoEvents.isEmpty {
                                 emptyPlaceholder("이벤트 없음")
                             } else {
@@ -135,6 +158,7 @@ struct DayDetailSheet: View {
                 let infos = await loadCalendars()
                 calendarsById = Dictionary(uniqueKeysWithValues: infos.map { ($0.identifier, $0) })
                 await reloadShiftInfo()
+                await reloadLunarAnniversaries()
             }
             .sheet(isPresented: $showShiftImage) {
                 shiftImageSheet
@@ -143,6 +167,7 @@ struct DayDetailSheet: View {
                 Task {
                     memos = await loadMemos(date)
                     await reloadShiftInfo()
+                    await reloadLunarAnniversaries()
                 }
             }) { sheet in
                 childSheetContent(for: sheet)
@@ -215,6 +240,10 @@ struct DayDetailSheet: View {
             HStack(spacing: 12) {
                 actionButton(title: "메모", systemImage: "square.and.pencil") {
                     childSheet = .memoEditor(.new(date: date))
+                }
+                actionButton(title: "음력기념일", systemImage: "moon.stars") {
+                    let (month, day) = LunarSolarConverter.lunarMonthDay(from: date, calendar: calendar)
+                    childSheet = .lunarAnniversaryEditor(.new(lunarMonth: month, lunarDay: day))
                 }
                 if shiftInfo?.config?.isCustomShift == false {
                     actionButton(title: "교번교체", systemImage: "arrow.left.arrow.right") {
@@ -414,6 +443,53 @@ struct DayDetailSheet: View {
         }
     }
 
+    private func reloadLunarAnniversaries() async {
+        let all = await loadLunarAnniversaries()
+        // 해당 날짜에 해당하는 기념일만 필터링
+        let cal = calendar
+        lunarAnniversaries = all.filter { dto in
+            LunarSolarConverter.solarDate(
+                lunarYear: cal.component(.year, from: date),
+                lunarMonth: dto.lunarMonth,
+                lunarDay: dto.lunarDay,
+                isLeapMonth: dto.isLeapMonth,
+                calendar: cal
+            ).map { cal.isDate($0, inSameDayAs: date) } ?? false
+        }
+    }
+
+    @ViewBuilder
+    private func lunarAnniversaryCard(for dto: LunarAnniversaryDTO) -> some View {
+        HStack(spacing: 12) {
+            RoundedRectangle(cornerRadius: 6)
+                .fill(Color(hex: dto.colorHex) ?? .gray)
+                .frame(width: 6)
+                .frame(height: 44)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(dto.title)
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+                Text("음력 \(dto.lunarMonth)월 \(dto.lunarDay)일\(dto.isLeapMonth ? " (윤달)" : "")")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            Spacer(minLength: 0)
+
+            Button {
+                childSheet = .lunarAnniversaryEditor(.edit(dto))
+            } label: {
+                Image(systemName: "pencil")
+                    .foregroundStyle(.secondary)
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(12)
+        .background(Color(.secondarySystemGroupedBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+    }
+
     @ViewBuilder
     private func childSheetContent(for sheet: DayChildSheet) -> some View {
         switch sheet {
@@ -449,6 +525,12 @@ struct DayDetailSheet: View {
                 onConfirm: { type, days in
                     Task { await createAttendance(type, days) }
                 }
+            )
+        case .lunarAnniversaryEditor(let mode):
+            LunarAnniversaryEditorSheet(
+                mode: mode,
+                onSave: { dto in Task { await saveLunarAnniversary(dto) } },
+                onDelete: { id in Task { await deleteLunarAnniversary(id) } }
             )
         }
     }

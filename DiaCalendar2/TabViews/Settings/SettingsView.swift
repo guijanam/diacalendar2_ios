@@ -37,6 +37,14 @@ struct SettingsView: View {
     var body: some View {
         NavigationStack {
             Form {
+                Section("기념일") {
+                    NavigationLink {
+                        LunarAnniversaryListView()
+                    } label: {
+                        Label("음력 기념일", systemImage: "moon.stars")
+                    }
+                }
+
                 Section("근무 설정") {
                     NavigationLink {
                         ShiftSetupView()

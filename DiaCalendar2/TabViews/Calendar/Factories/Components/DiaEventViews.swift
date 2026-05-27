@@ -180,7 +180,8 @@ struct DiaMonthEventView: View {
         let fg = ContrastPalette.textColor(onSolid: color)
         let done = event.data.isDone == true
         let scale = event.data.kind == .memo ? memoScale : eventScale
-        Text(event.title)
+        let prefix = event.data.kind == .lunarAnniversary ? "음) " : ""
+        Text(prefix + event.title)
             .strikethrough(done, color: fg)
             .lineLimit(1)
             .truncationMode(.tail)

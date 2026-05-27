@@ -59,7 +59,8 @@ struct ContentView: View {
                             diaRecordRepository: appEnvironment.diaRecordRepository,
                             holidayRepository: appEnvironment.holidayRepository,
                             dateMemoRepository: appEnvironment.dateMemoRepository,
-                            syncStateRepository: appEnvironment.syncStateRepository
+                            syncStateRepository: appEnvironment.syncStateRepository,
+                            lunarAnniversaryRepository: appEnvironment.lunarAnniversaryRepository
                         )
                     }
                 }
