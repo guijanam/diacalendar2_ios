@@ -772,6 +772,22 @@ extension FullCalendarViewModelModel {
         await userShiftConfigRepository?.load()?.officeName
     }
 
+    /// 사무소 전체 dia의 numTr1/numTr2 중, target이 "마지막 토큰"으로 오는
+    /// 문자열을 찾아 바로 앞 토큰(전 열번)을 반환. 2호선 홀수 교대 보조용.
+    func previousTrainNo(forMyTrainNo target: String) async -> String? {
+        guard let name = await userShiftConfigRepository?.load()?.officeName else { return nil }
+        guard let dias = await diaRecordRepository?.dias(forOffice: name) else { return nil }
+        for dia in dias {
+            for raw in [dia.numTr1, dia.numTr2].compactMap({ $0 }) {
+                let tokens = SubwayLine.tokens(from: raw)
+                if tokens.last == target, tokens.count >= 2 {
+                    return tokens[tokens.count - 2]
+                }
+            }
+        }
+        return nil
+    }
+
     /// ShiftSetup의 "기준 근무" 드롭다운과 동일한 데이터.
     /// office.diaSelects가 있으면 그것, 없으면 사용자 설정 패턴, CustomShift도 패턴.
     func referenceShiftOptions() async -> [String] {

@@ -471,6 +471,7 @@ struct FullCalendarView: View {
                 },
                 loadLunarAnniversaries: { await viewModel.allLunarAnniversaries() },
                 loadConfiguredOfficeName: { await viewModel.configuredOfficeName() },
+                loadPreviousTrainNo: { await viewModel.previousTrainNo(forMyTrainNo: $0) },
                 saveLunarAnniversary: { dto in await viewModel.saveLunarAnniversary(dto) },
                 deleteLunarAnniversary: { id in await viewModel.deleteLunarAnniversary(id: id) }
             )

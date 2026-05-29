@@ -40,6 +40,8 @@ struct DayDetailSheet: View {
     let loadLunarAnniversaries: () async -> [LunarAnniversaryDTO]
     /// 사용자가 설정한 승무소 이름. 외부 Safari 버튼의 대상 URL을 결정한다.
     let loadConfiguredOfficeName: () async -> String?
+    /// 내 열번이 마지막 토큰으로 오는 numTr 데이터에서 바로 앞 토큰(전 열번)을 조회. 2호선 홀수 교대 보조용.
+    let loadPreviousTrainNo: (_ myTrainNo: String) async -> String?
     let saveLunarAnniversary: (LunarAnniversaryDTO) async -> Void
     let deleteLunarAnniversary: (UUID) async -> Void
 
@@ -49,6 +51,7 @@ struct DayDetailSheet: View {
         case shiftInput
         case attendance
         case lunarAnniversaryEditor(LunarAnniversaryEditorMode)
+        case trainPosition(line: Int, myTrainNo: String, previousTrainNo: String?)
 
         var id: String {
             switch self {
@@ -59,6 +62,7 @@ struct DayDetailSheet: View {
             case .attendance: return "attendance"
             case .lunarAnniversaryEditor(.new(let m, let d)): return "lunar-new-\(m)-\(d)"
             case .lunarAnniversaryEditor(.edit(let dto)): return "lunar-edit-\(dto.id.uuidString)"
+            case .trainPosition(let line, let my, let prev): return "train-\(line)-\(my)-\(prev ?? "")"
             }
         }
     }
@@ -644,6 +648,8 @@ struct DayDetailSheet: View {
                 onSave: { dto in Task { await saveLunarAnniversary(dto) } },
                 onDelete: { id in Task { await deleteLunarAnniversary(id) } }
             )
+        case .trainPosition(let line, let my, let prev):
+            TrainPositionSheet(line: line, myTrainNo: my, previousTrainNo: prev)
         }
     }
 
@@ -793,9 +799,32 @@ struct DayDetailSheet: View {
                         alignment: .leading
                     )
                 Spacer()
+                if let my = SubwayLine.myTrainNo(from: trainNumber),
+                   let line = SubwayLine.line(fromTrainNo: my) {
+                    trainPositionButton(line: line, myTrainNo: my)
+                }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
+    }
+
+    @ViewBuilder
+    private func trainPositionButton(line: Int, myTrainNo: String) -> some View {
+        Button {
+            Task {
+                let prev = SubwayLine.isOdd(myTrainNo) ? await loadPreviousTrainNo(myTrainNo) : nil
+                childSheet = .trainPosition(line: line, myTrainNo: myTrainNo, previousTrainNo: prev)
+            }
+        } label: {
+            Image(systemName: "tram.fill")
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundColor(.accentColor)
+                .frame(width: 36, height: 30)
+                .background(Color.accentColor.opacity(0.12))
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("실시간 열차 위치")
     }
 
     @ViewBuilder
