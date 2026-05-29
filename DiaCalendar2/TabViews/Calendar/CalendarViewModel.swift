@@ -768,6 +768,10 @@ extension FullCalendarViewModelModel {
         (await userShiftConfigRepository?.load())?.shiftPattern ?? []
     }
 
+    func configuredOfficeName() async -> String? {
+        await userShiftConfigRepository?.load()?.officeName
+    }
+
     /// ShiftSetup의 "기준 근무" 드롭다운과 동일한 데이터.
     /// office.diaSelects가 있으면 그것, 없으면 사용자 설정 패턴, CustomShift도 패턴.
     func referenceShiftOptions() async -> [String] {

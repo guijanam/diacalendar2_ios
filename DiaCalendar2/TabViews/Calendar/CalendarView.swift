@@ -470,6 +470,7 @@ struct FullCalendarView: View {
                     await viewModel.createJiGeunHyu(on: date, category: category, days: days)
                 },
                 loadLunarAnniversaries: { await viewModel.allLunarAnniversaries() },
+                loadConfiguredOfficeName: { await viewModel.configuredOfficeName() },
                 saveLunarAnniversary: { dto in await viewModel.saveLunarAnniversary(dto) },
                 deleteLunarAnniversary: { id in await viewModel.deleteLunarAnniversary(id: id) }
             )

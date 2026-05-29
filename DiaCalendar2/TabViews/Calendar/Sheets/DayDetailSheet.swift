@@ -38,6 +38,8 @@ struct DayDetailSheet: View {
     /// 지근/지휴 등록. 근태와 동일한 흐름이지만 분류(category)를 함께 저장한다.
     let createJiGeunHyu: (_ category: AttendanceCategory, _ days: Int) async -> Void
     let loadLunarAnniversaries: () async -> [LunarAnniversaryDTO]
+    /// 사용자가 설정한 승무소 이름. 외부 Safari 버튼의 대상 URL을 결정한다.
+    let loadConfiguredOfficeName: () async -> String?
     let saveLunarAnniversary: (LunarAnniversaryDTO) async -> Void
     let deleteLunarAnniversary: (UUID) async -> Void
 
@@ -76,6 +78,17 @@ struct DayDetailSheet: View {
     @State private var showShiftImage = false
     @State private var showInvalidImageAlert = false
     @State private var shiftImageURL: URL?
+    @State private var configuredOfficeName: String?
+    @State private var configuredOfficeURL: URL?
+    @State private var secondaryOfficeURL: URL?
+    @State private var showOfficeWeb = false
+    @State private var officeWebSource: OfficeWebSource = .primary
+    @State private var pendingPasswordOfficeName: String?
+
+    private enum OfficeWebSource {
+        case primary
+        case secondary
+    }
 
     var body: some View {
         NavigationStack {
@@ -84,6 +97,14 @@ struct DayDetailSheet: View {
                     VStack(alignment: .leading, spacing: 20) {
                         if let info = shiftInfo {
                             shiftSection(info: info)
+                        }
+                        
+                        VStack(alignment: .leading, spacing: 8) {
+                            VStack(spacing: 10) {
+                                ForEach(lunarAnniversaries, id: \.id) { anniversary in
+                                    lunarAnniversaryCard(for: anniversary)
+                                }
+                            }
                         }
 
                         VStack(alignment: .leading, spacing: 8) {
@@ -98,19 +119,20 @@ struct DayDetailSheet: View {
                                 }
                             }
                         }
+                        
 
-                        VStack(alignment: .leading, spacing: 8) {
-                            sectionHeader("음력 기념일")
-                            if lunarAnniversaries.isEmpty {
-                                emptyPlaceholder("음력 기념일 없음")
-                            } else {
-                                VStack(spacing: 10) {
-                                    ForEach(lunarAnniversaries, id: \.id) { anniversary in
-                                        lunarAnniversaryCard(for: anniversary)
-                                    }
-                                }
-                            }
-                        }
+//                        VStack(alignment: .leading, spacing: 8) {
+//                            sectionHeader("음력 기념일")
+//                            if lunarAnniversaries.isEmpty {
+//                                emptyPlaceholder("음력 기념일 없음")
+//                            } else {
+//                                VStack(spacing: 10) {
+//                                    ForEach(lunarAnniversaries, id: \.id) { anniversary in
+//                                        lunarAnniversaryCard(for: anniversary)
+//                                    }
+//                                }
+//                            }
+//                        }
 
                         VStack(alignment: .leading, spacing: 8) {
                             sectionHeader("이벤트")
@@ -159,9 +181,22 @@ struct DayDetailSheet: View {
                 calendarsById = Dictionary(uniqueKeysWithValues: infos.map { ($0.identifier, $0) })
                 await reloadShiftInfo()
                 await reloadLunarAnniversaries()
+                if let name = await loadConfiguredOfficeName() {
+                    configuredOfficeName = name
+                    configuredOfficeURL = OfficeWebURLMap.externalURL(for: name)
+                    secondaryOfficeURL = OfficeWebURLMap.secondaryExternalURL(for: name)
+                }
             }
             .sheet(isPresented: $showShiftImage) {
                 shiftImageSheet
+            }
+            .sheet(isPresented: $showOfficeWeb) {
+                officeWebSheet
+            }
+            .sheet(item: $pendingPasswordOfficeName) { name in
+                WebPasswordSheet(officeName: name) {
+                    showOfficeWeb = true
+                }
             }
             .sheet(item: $childSheet, onDismiss: {
                 Task {
@@ -233,6 +268,87 @@ struct DayDetailSheet: View {
         }
     }
 
+    private func appendDateQuery(to base: URL?) -> URL? {
+        guard let base,
+              var components = URLComponents(url: base, resolvingAgainstBaseURL: false) else {
+            return base
+        }
+        let formatter = DateFormatter()
+        formatter.calendar = calendar
+        formatter.timeZone = calendar.timeZone
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "yyyy-MM-dd"
+        let dateString = formatter.string(from: date)
+        var items = components.queryItems ?? []
+        items.removeAll { $0.name == "date" }
+        items.append(URLQueryItem(name: "date", value: dateString))
+        components.queryItems = items
+        return components.url ?? base
+    }
+
+    private var activeOfficeWebURL: URL? {
+        switch officeWebSource {
+        case .primary:   return appendDateQuery(to: configuredOfficeURL)
+        case .secondary: return appendDateQuery(to: secondaryOfficeURL)
+        }
+    }
+
+    @ViewBuilder
+    private var officeWebSheet: some View {
+        NavigationStack {
+            VStack(spacing: 0) {
+                Group {
+                    if let url = activeOfficeWebURL {
+                        WebView(url: url)
+                    } else {
+                        Color.clear
+                    }
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+
+                Divider()
+                HStack(spacing: 12) {
+                    officeWebSourceButton(title: "기본", source: .primary, isEnabled: configuredOfficeURL != nil)
+                    officeWebSourceButton(title: "보조", source: .secondary, isEnabled: secondaryOfficeURL != nil)
+                }
+                .padding(.horizontal, 16)
+                .padding(.top, 10)
+                .padding(.bottom, 8)
+                .background(.bar)
+            }
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("닫기") { showOfficeWeb = false }
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func officeWebSourceButton(
+        title: String,
+        source: OfficeWebSource,
+        isEnabled: Bool
+    ) -> some View {
+        let isActive = officeWebSource == source
+        Button {
+            officeWebSource = source
+        } label: {
+            Text(title)
+                .font(.subheadline)
+                .fontWeight(.semibold)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 10)
+                .background(isActive ? Color.accentColor : Color(.secondarySystemBackground))
+                .foregroundColor(isActive ? .white : .accentColor)
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+        }
+        .buttonStyle(.plain)
+        .disabled(!isEnabled)
+        .opacity(isEnabled ? 1 : 0.4)
+    }
+
     @ViewBuilder
     private var actionBar: some View {
         VStack(spacing: 0) {
@@ -241,10 +357,10 @@ struct DayDetailSheet: View {
                 actionButton(title: "메모", systemImage: "square.and.pencil") {
                     childSheet = .memoEditor(.new(date: date))
                 }
-                actionButton(title: "음력기념일", systemImage: "moon.stars") {
-                    let (month, day) = LunarSolarConverter.lunarMonthDay(from: date, calendar: calendar)
-                    childSheet = .lunarAnniversaryEditor(.new(lunarMonth: month, lunarDay: day))
-                }
+//                actionButton(title: "음력기념일", systemImage: "moon.stars") {
+//                    let (month, day) = LunarSolarConverter.lunarMonthDay(from: date, calendar: calendar)
+//                    childSheet = .lunarAnniversaryEditor(.new(lunarMonth: month, lunarDay: day))
+//                }
                 if shiftInfo?.config?.isCustomShift == false {
                     actionButton(title: "교번교체", systemImage: "arrow.left.arrow.right") {
                         childSheet = .shiftSwap
@@ -256,19 +372,10 @@ struct DayDetailSheet: View {
                 actionButton(title: "근태(휴가)", systemImage: "tag") {
                     childSheet = .attendance
                 }
-                actionButton(
-                    title: "지근",
-                    systemImage: "calendar.badge.minus",
-                    tint: Color(hex: AttendanceCategory.jigeun.colorHex)
-                ) {
-                    handleJiGeunHyu(.jigeun)
-                }
-                actionButton(
-                    title: "지휴",
-                    systemImage: "calendar.badge.plus",
-                    tint: Color(hex: AttendanceCategory.jihyu.colorHex)
-                ) {
-                    handleJiGeunHyu(.jihyu)
+                if configuredOfficeURL != nil {
+                    actionButton(title: "승무소웹", systemImage: "safari") {
+                        handleOfficeWebTap()
+                    }
                 }
             }
             .padding(.horizontal, 16)
@@ -316,10 +423,10 @@ struct DayDetailSheet: View {
                                         shiftImageURL = url
                                         showShiftImage = true
                                     } label: {
-                                        Label("시간표", systemImage: "photo")
+                                        Label("", systemImage: "photo")
                                             .font(.caption)
-                                            .padding(.horizontal, 10)
-                                            .padding(.vertical, 5)
+                                            .padding(.horizontal, 4)
+                                            .padding(.vertical, 2)
                                             .background(Color.accentColor.opacity(0.12))
                                             .foregroundColor(.accentColor)
                                             .clipShape(Capsule())
@@ -355,6 +462,11 @@ struct DayDetailSheet: View {
                             }
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                    Spacer()
+
+                    if !isCustom {
+                        jiGeunHyuColumn
                     }
 
                     if hasOverlay {
@@ -544,6 +656,20 @@ struct DayDetailSheet: View {
         }
     }
 
+    private func handleOfficeWebTap() {
+        guard let name = configuredOfficeName else {
+            showOfficeWeb = true
+            return
+        }
+        if let password = OfficeWebURLMap.entry(for: name)?.password,
+           !password.isEmpty,
+           !WebPasswordStore.isAuthenticated(for: name) {
+            pendingPasswordOfficeName = name
+        } else {
+            showOfficeWeb = true
+        }
+    }
+
     private func handleShiftBadgeTap(info: ShiftDayInfo) {
         let raw = info.dia?.thirdTime ?? ""
         if (raw.hasPrefix("http://") || raw.hasPrefix("https://")), let url = URL(string: raw) {
@@ -560,6 +686,45 @@ struct DayDetailSheet: View {
             await createJiGeunHyu(category, 1)
             await reloadShiftInfo()
         }
+    }
+
+    @ViewBuilder
+    private var jiGeunHyuColumn: some View {
+        VStack(spacing: 6) {
+            jiGeunHyuIconButton(
+                systemImage: "calendar.badge.minus",
+                tint: Color(hex: AttendanceCategory.jigeun.colorHex) ?? .secondary,
+                accessibilityLabel: "지근"
+            ) {
+                handleJiGeunHyu(.jigeun)
+            }
+            jiGeunHyuIconButton(
+                systemImage: "calendar.badge.plus",
+                tint: Color(hex: AttendanceCategory.jihyu.colorHex) ?? .secondary,
+                accessibilityLabel: "지휴"
+            ) {
+                handleJiGeunHyu(.jihyu)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func jiGeunHyuIconButton(
+        systemImage: String,
+        tint: Color,
+        accessibilityLabel: String,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            Image(systemName: systemImage)
+                .font(.system(size: 18, weight: .semibold))
+                .foregroundColor(tint)
+                .frame(width: 36, height: 30)
+                .background(tint.opacity(0.12))
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(accessibilityLabel)
     }
 
     @ViewBuilder
@@ -935,7 +1100,8 @@ private struct MusicPlayerGroupBoxStyle: GroupBoxStyle {
                 .foregroundColor(.secondary)
             configuration.content
         }
-        .padding()
+        .padding(.vertical, 10)
+        .padding(.horizontal, 5)
         .background(.regularMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 15, style: .continuous))
     }

@@ -176,19 +176,19 @@ struct SettingsView: View {
                 }
 
                 Section {
-                    monthFontScaleSlider(title: "날짜", value: $dateFontScale)
-                    monthFontScaleSlider(title: "근무", value: $shiftFontScale)
-                    monthFontScaleSlider(title: "이벤트", value: $eventFontScale)
-                    monthFontScaleSlider(title: "메모", value: $memoFontScale)
-                    Button("기본값") {
-                        dateFontScale = MonthFontScale.defaultScale
-                        shiftFontScale = MonthFontScale.defaultScale
-                        eventFontScale = MonthFontScale.defaultScale
-                        memoFontScale = MonthFontScale.defaultScale
+                    DisclosureGroup("월간달력 글자 크기") {
+                        monthFontScaleSlider(title: "날짜", value: $dateFontScale)
+                        monthFontScaleSlider(title: "근무", value: $shiftFontScale)
+                        monthFontScaleSlider(title: "이벤트", value: $eventFontScale)
+                        monthFontScaleSlider(title: "메모", value: $memoFontScale)
+                        Button("기본값") {
+                            dateFontScale = MonthFontScale.defaultScale
+                            shiftFontScale = MonthFontScale.defaultScale
+                            eventFontScale = MonthFontScale.defaultScale
+                            memoFontScale = MonthFontScale.defaultScale
+                        }
+                        .font(.caption)
                     }
-                    .font(.caption)
-                } header: {
-                    Text("월간달력 글자 크기")
                 } footer: {
                     Text("월간달력 셀에 표시되는 날짜·근무·이벤트·메모의 글자 크기를 각각 조절합니다. 다른 화면은 영향 받지 않습니다.")
                 }

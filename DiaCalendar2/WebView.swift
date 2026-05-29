@@ -17,9 +17,10 @@ struct WebView: UIViewRepresentable {
         return WKWebView()
     }
 
-    // 2. 뷰가 업데이트될 때 호출되며, 여기서 전달받은 URL을 로드합니다.
+    // 2. 뷰가 업데이트될 때 호출되며, URL이 바뀌었을 때만 로드합니다.
     func updateUIView(_ webView: WKWebView, context: Context) {
-        let request = URLRequest(url: url)
-        webView.load(request)
+        if webView.url != url {
+            webView.load(URLRequest(url: url))
+        }
     }
 }
