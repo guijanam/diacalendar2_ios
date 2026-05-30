@@ -16,7 +16,9 @@ struct CoworkerShiftBadge: View {
     var body: some View {
         let colorHex = ShiftColor.colorHex(for: shiftName, isSwap: false)
         let baseColor = colorHex.flatMap { Color(hex: $0) } ?? .accentColor
-        let textColor = ContrastPalette.readableForeground(baseColor, scheme: colorScheme)
+        // 내 근무: 배경색 채움 + 대비 보정 글자색.
+        // 동료 근무: 배경 없이 근무 색상 글자만 (내 근무와 구분).
+        let textColor = isMine ? ContrastPalette.readableForeground(baseColor, scheme: colorScheme) : baseColor
 
         Text(shiftName)
             .font(.system(size: fontSize, weight: .bold, design: .rounded))
@@ -26,7 +28,7 @@ struct CoworkerShiftBadge: View {
             .padding(.horizontal, 4)
             .frame(maxWidth: .infinity)
             .frame(height: fontSize + 6)
-            .background(baseColor.opacity(isMine ? 0.22 : 0.14))
+            .background(isMine ? baseColor.opacity(0.22) : Color.clear)
             .clipShape(RoundedRectangle(cornerRadius: 4))
     }
 }

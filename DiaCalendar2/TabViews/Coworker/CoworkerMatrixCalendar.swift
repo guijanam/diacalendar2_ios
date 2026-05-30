@@ -127,7 +127,7 @@ struct CoworkerMatrixCalendar: View {
             let isHoliday = holidayDates.contains(day)
 
             VStack(spacing: 1) {
-                Text("\(dayNumber)")
+                Text("\(dayNumber)일")
                     .font(.system(size: 12, weight: isToday ? .heavy : .regular))
                     .foregroundStyle(dayNumberColor(col: col, isToday: isToday, isHoliday: isHoliday))
                     .frame(height: dateHeaderHeight)
@@ -142,6 +142,7 @@ struct CoworkerMatrixCalendar: View {
             .frame(maxWidth: .infinity)
             .frame(height: rowHeight)
             .padding(.horizontal, 2)
+            .background(isHoliday ? Color.red.opacity(0.08) : Color.clear)
             .contentShape(Rectangle())
             .overlay(
                 Rectangle().stroke(
