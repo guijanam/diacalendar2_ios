@@ -106,6 +106,8 @@ struct ContentView: View {
         HolidayRecord.self,
         AttendanceType.self,
         AttendanceRecord.self,
+        Coworker.self,
+        CoworkerGroup.self,
     ])
     let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
     let container = try! ModelContainer(for: schema, configurations: [configuration])

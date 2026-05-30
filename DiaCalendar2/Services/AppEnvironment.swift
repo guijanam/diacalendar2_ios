@@ -55,6 +55,9 @@ final class AppEnvironment {
     // 음력 기념일
     let lunarAnniversaryRepository: LunarAnniversaryRepository
 
+    // 동료근무
+    let coworkerRepository: CoworkerRepository
+
     // 로컬 알림
     let localNotificationService: LocalNotificationService
 
@@ -103,6 +106,8 @@ final class AppEnvironment {
         rcService.configure()
 
         self.lunarAnniversaryRepository = LunarAnniversaryRepository(modelContainer: modelContainer)
+
+        self.coworkerRepository = CoworkerRepository(modelContainer: modelContainer)
 
         self.localNotificationService = LocalNotificationService()
 

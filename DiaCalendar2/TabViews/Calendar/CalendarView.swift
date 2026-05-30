@@ -81,6 +81,7 @@ struct FullCalendarView: View {
     @State private var contentOffset: CGPoint?
     @State private var pendingSheet: CalendarSheet?
     @State private var isMonthPickerPresented: Bool = false
+    @State private var showCoworker: Bool = false
 
     var body: some View {
         VStack {
@@ -95,6 +96,9 @@ struct FullCalendarView: View {
                 monthView()
             }
         }
+        .navigationDestination(isPresented: $showCoworker) {
+            CoworkerView()
+        }
         .fontDesign(.serif)
         .yoteiDelegate(viewModel)
         .navigationBarTitleDisplayMode(.inline)
@@ -103,9 +107,20 @@ struct FullCalendarView: View {
                 monthTitle
             }
             ToolbarItem(placement: .topBarTrailing) {
-                Button("Today") {
-                    viewModel.viewDidSelectToday()
+                Button {
+                    showCoworker = true
+                } label: {
+                    Image(systemName: "person.2.fill")
                 }
+                .accessibilityLabel("동료 근무")
+            }
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    viewModel.viewDidSelectToday()
+                } label: {
+                    Image(systemName: "arrow.counterclockwise")
+                }
+                .accessibilityLabel("오늘")
             }
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
@@ -116,27 +131,31 @@ struct FullCalendarView: View {
                 .accessibilityLabel("새 이벤트")
             }
             ToolbarItem(placement: .topBarTrailing) {
-                Button(action: {
-                    viewModel.viewDidSelectTimezoneSelector()
-                }) {
-                    Image(.timezoneIcon)
-                }
-            }
-            ToolbarItem(placement: .topBarTrailing) {
-                Menu(content: {
-                    ForEach(CalendarViewType.allCases, id: \.self) { value in
-                        Button(action: {
-                            viewModel.viewType = value
-                        }) {
-                            Label {
-                                Text(value.title)
-                            } icon: {
-                                value.icon
+                Menu {
+                    // 뷰 타입 (서브메뉴)
+                    Menu {
+                        ForEach(CalendarViewType.allCases, id: \.self) { value in
+                            Button(action: {
+                                viewModel.viewType = value
+                            }) {
+                                Label {
+                                    Text(value.title)
+                                } icon: {
+                                    value.icon
+                                }
                             }
                         }
+                    } label: {
+                        Label("보기 방식", systemImage: "calendar")
                     }
-                }) {
-                    viewModel.viewType.icon
+                    // 타임존
+                    Button(action: {
+                        viewModel.viewDidSelectTimezoneSelector()
+                    }) {
+                        Label("방문", systemImage: "globe")
+                    }
+                } label: {
+                    Image(systemName: "ellipsis.circle")
                 }
             }
         }

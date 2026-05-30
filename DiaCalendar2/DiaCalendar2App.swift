@@ -40,6 +40,8 @@ struct DiaCalendar2App: App {
             AttendanceType.self,
             AttendanceRecord.self,
             LunarAnniversary.self,
+            Coworker.self,
+            CoworkerGroup.self,
         ])
         let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
         do {
