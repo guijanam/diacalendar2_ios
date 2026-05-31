@@ -23,6 +23,28 @@ actor ShiftSwapRecordRepository {
         return (try? modelContext.fetch(FetchDescriptor(predicate: predicate)).first)?.toDTO()
     }
 
+    /// 백업용: 전체 조회.
+    func all() -> [ShiftSwapRecordDTO] {
+        ((try? modelContext.fetch(FetchDescriptor<ShiftSwapRecord>())) ?? []).map { $0.toDTO() }
+    }
+
+    /// 복원용: 기존 데이터를 모두 지우고 DTO의 필드(groupId/createdAt 포함)를 그대로 insert.
+    func restoreAll(_ dtos: [ShiftSwapRecordDTO]) {
+        if let existing = try? modelContext.fetch(FetchDescriptor<ShiftSwapRecord>()) {
+            for r in existing { modelContext.delete(r) }
+        }
+        for dto in dtos {
+            modelContext.insert(ShiftSwapRecord(
+                date: dto.date,
+                originalShiftName: dto.originalShiftName,
+                swappedShiftName: dto.swappedShiftName,
+                groupId: dto.groupId,
+                createdAt: dto.createdAt
+            ))
+        }
+        try? modelContext.save()
+    }
+
     /// Insert or replace a swap on `date`.
     func upsert(date: Date, originalShiftName: String, swappedShiftName: String) {
         let day = ShiftRotationEngine.startOfDay(date)

@@ -23,6 +23,31 @@ actor ShiftInputRecordRepository {
         return (try? modelContext.fetch(FetchDescriptor(predicate: predicate)).first)?.toDTO()
     }
 
+    /// 백업용: 전체 조회.
+    func all() -> [ShiftInputRecordDTO] {
+        ((try? modelContext.fetch(FetchDescriptor<ShiftInputRecord>())) ?? []).map { $0.toDTO() }
+    }
+
+    /// 복원용: 기존 데이터를 모두 지우고 DTO의 모든 스냅샷 필드를 그대로 insert.
+    func restoreAll(_ dtos: [ShiftInputRecordDTO]) {
+        if let existing = try? modelContext.fetch(FetchDescriptor<ShiftInputRecord>()) {
+            for r in existing { modelContext.delete(r) }
+        }
+        for dto in dtos {
+            modelContext.insert(ShiftInputRecord(
+                date: dto.date,
+                shiftInputTypeId: dto.shiftInputTypeId,
+                shortName: dto.shortName,
+                colorHex: dto.colorHex,
+                targetShiftName: dto.targetShiftName,
+                originalShiftName: dto.originalShiftName,
+                groupId: dto.groupId,
+                createdAt: dto.createdAt
+            ))
+        }
+        try? modelContext.save()
+    }
+
     /// Insert a multi-day shift-input run using the rotating pattern (mirrors Android logic).
     /// - For each day from `startDate` to `startDate + days - 1`:
     ///   - The displayed target shift is taken from the pattern at offset.

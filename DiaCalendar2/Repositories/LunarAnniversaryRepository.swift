@@ -50,4 +50,12 @@ actor LunarAnniversaryRepository {
             try? modelContext.save()
         }
     }
+
+    /// 복원용: 모든 기념일 삭제.
+    func deleteAll() {
+        if let existing = try? modelContext.fetch(FetchDescriptor<LunarAnniversary>()) {
+            for r in existing { modelContext.delete(r) }
+            try? modelContext.save()
+        }
+    }
 }

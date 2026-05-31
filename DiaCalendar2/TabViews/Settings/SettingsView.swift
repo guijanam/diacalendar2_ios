@@ -4,6 +4,7 @@
 //
 
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct SettingsView: View {
     @Environment(AppEnvironment.self) private var appEnvironment
@@ -28,6 +29,17 @@ struct SettingsView: View {
     @State private var isVIPRefreshing: Bool = false
     @State private var vipRefreshResult: Bool? = nil
 
+    // 백업/복원
+    @State private var isBackupInProgress = false
+    @State private var isRestoreInProgress = false
+    @State private var backupRestoreMessage: String?
+    @State private var backupRestoreIsError = false
+    @State private var backupDocument: BackupDocument?
+    @State private var isExporterPresented = false
+    @State private var isImporterPresented = false
+    @State private var pendingRestoreURL: URL?
+    @State private var isRestoreConfirmPresented = false
+
     @AppStorage(AppearanceMode.storageKey) private var appearanceRaw: String = AppearanceMode.system.rawValue
     @AppStorage(MonthFontScale.dateStorageKey) private var dateFontScale: Double = MonthFontScale.defaultScale
     @AppStorage(MonthFontScale.shiftStorageKey) private var shiftFontScale: Double = MonthFontScale.defaultScale
@@ -38,10 +50,23 @@ struct SettingsView: View {
         NavigationStack {
             Form {
                 Section("기념일") {
-                    NavigationLink {
-                        LunarAnniversaryListView()
-                    } label: {
-                        Label("음력 기념일", systemImage: "moon.stars")
+                    if isPremiumUser {
+                        NavigationLink {
+                            LunarAnniversaryListView()
+                        } label: {
+                            Label("음력 기념일", systemImage: "moon.stars")
+                        }
+                    } else {
+                        Button {
+                            showPaywall = true
+                        } label: {
+                            HStack {
+                                Label("음력 기념일", systemImage: "moon.stars")
+                                Spacer()
+                                Image(systemName: "lock.fill")
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
                     }
                 }
 
@@ -160,10 +185,54 @@ struct SettingsView: View {
                                 .disabled(isCalendarRefreshing) // 로딩 중 클릭 방지
                     }
 
-                
+
                 }
 
-                
+                Section {
+                    DisclosureGroup("데이터 백업 / 복원") {
+                        Button {
+                            guard requirePremiumOrShowPaywall() else { return }
+                            Task { await backupData() }
+                        } label: {
+                            HStack {
+                                Label("백업 (내보내기)", systemImage: "square.and.arrow.up")
+                                Spacer()
+                                if !isPremiumUser {
+                                    Image(systemName: "lock.fill")
+                                        .foregroundStyle(.secondary)
+                                } else if isBackupInProgress {
+                                    ProgressView()
+                                }
+                            }
+                        }
+                        .disabled(isBackupInProgress || isRestoreInProgress)
+
+                        Button {
+                            guard requirePremiumOrShowPaywall() else { return }
+                            isImporterPresented = true
+                        } label: {
+                            HStack {
+                                Label("복원 (가져오기)", systemImage: "square.and.arrow.down")
+                                Spacer()
+                                if !isPremiumUser {
+                                    Image(systemName: "lock.fill")
+                                        .foregroundStyle(.secondary)
+                                } else if isRestoreInProgress {
+                                    ProgressView()
+                                }
+                            }
+                        }
+                        .disabled(isBackupInProgress || isRestoreInProgress)
+
+                        if let msg = backupRestoreMessage {
+                            Text(msg)
+                                .font(.caption)
+                                .foregroundStyle(backupRestoreIsError ? .red : .secondary)
+                        }
+                    }
+                } footer: {
+                    Text("근무 설정·교체·충당·근태·메모·기념일을 파일로 백업합니다. 복원하면 현재 데이터가 백업 내용으로 교체됩니다. (공휴일은 ‘공휴일 정보 갱신’으로 다시 받을 수 있습니다.)")
+                }
 
                 Section("테마") {
                     Picker("외관", selection: $appearanceRaw) {
@@ -333,6 +402,47 @@ struct SettingsView: View {
             .sheet(isPresented: $showPaywall) {
                 CustomPaywallView()
             }
+            .fileExporter(
+                isPresented: $isExporterPresented,
+                document: backupDocument,
+                contentType: .json,
+                defaultFilename: backupDefaultFilename()
+            ) { result in
+                switch result {
+                case .success:
+                    backupRestoreIsError = false
+                    backupRestoreMessage = "백업 파일을 저장했습니다."
+                case .failure(let error):
+                    backupRestoreIsError = true
+                    backupRestoreMessage = "백업 저장 실패: \(error.localizedDescription)"
+                }
+                backupDocument = nil
+            }
+            .fileImporter(
+                isPresented: $isImporterPresented,
+                allowedContentTypes: [.json],
+                allowsMultipleSelection: false
+            ) { result in
+                switch result {
+                case .success(let urls):
+                    guard let url = urls.first else { return }
+                    pendingRestoreURL = url
+                    isRestoreConfirmPresented = true
+                case .failure(let error):
+                    backupRestoreIsError = true
+                    backupRestoreMessage = "파일 선택 실패: \(error.localizedDescription)"
+                }
+            }
+            .alert("데이터 복원", isPresented: $isRestoreConfirmPresented) {
+                Button("취소", role: .cancel) { pendingRestoreURL = nil }
+                Button("복원", role: .destructive) {
+                    if let url = pendingRestoreURL {
+                        Task { await restoreData(from: url) }
+                    }
+                }
+            } message: {
+                Text("현재 기기의 근무 설정·교체·충당·근태·메모·기념일이 백업 내용으로 교체됩니다. 계속할까요?")
+            }
         }
     }
 
@@ -414,6 +524,67 @@ struct SettingsView: View {
         currentShiftConfig = await appEnvironment.userShiftConfigRepository.load()
         holidayLastSyncAt = await appEnvironment.syncStateRepository.lastHolidaySyncAt()
         await refreshCalendarLabels()
+    }
+
+    // MARK: - 백업/복원
+
+    /// 구독 또는 VIP 사용자 여부. 백업/복원은 프리미엄 전용.
+    private var isPremiumUser: Bool {
+        appEnvironment.revenueCatService.isSubscribed || appEnvironment.revenueCatService.isVIP
+    }
+
+    /// 프리미엄이면 true 반환. 아니면 페이월을 띄우고 false 반환.
+    private func requirePremiumOrShowPaywall() -> Bool {
+        if isPremiumUser { return true }
+        showPaywall = true
+        return false
+    }
+
+    private func backupDefaultFilename() -> String {
+        let f = DateFormatter()
+        f.dateFormat = "yyyyMMdd"
+        return "DiaCalendar_백업_\(f.string(from: Date()))"
+    }
+
+    private func backupData() async {
+        isBackupInProgress = true
+        backupRestoreMessage = nil
+        backupRestoreIsError = false
+        defer { isBackupInProgress = false }
+
+        do {
+            let data = try await BackupService.export(using: appEnvironment)
+            backupDocument = BackupDocument(data: data)
+            isExporterPresented = true
+        } catch {
+            backupRestoreIsError = true
+            backupRestoreMessage = "백업 생성 실패: \(error.localizedDescription)"
+        }
+    }
+
+    private func restoreData(from url: URL) async {
+        isRestoreInProgress = true
+        backupRestoreMessage = nil
+        backupRestoreIsError = false
+        defer {
+            isRestoreInProgress = false
+            pendingRestoreURL = nil
+        }
+
+        // 보안 스코프 파일 접근(파일 앱/iCloud Drive에서 선택된 경우).
+        let scoped = url.startAccessingSecurityScopedResource()
+        defer { if scoped { url.stopAccessingSecurityScopedResource() } }
+
+        do {
+            let data = try Data(contentsOf: url)
+            let count = try await BackupService.restore(from: data, using: appEnvironment)
+            backupRestoreIsError = false
+            backupRestoreMessage = "복원 완료: \(count)개 항목을 가져왔습니다."
+            await refreshState()
+        } catch {
+            backupRestoreIsError = true
+            backupRestoreMessage = "복원 실패: \(error.localizedDescription)"
+        }
     }
 
     private func refreshHolidays() async {

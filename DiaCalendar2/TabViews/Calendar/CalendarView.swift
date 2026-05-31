@@ -37,6 +37,7 @@ struct FullCalendarView: View {
     }
 
     @StateObject private var viewModel: FullCalendarViewModelModel
+    @Environment(AppEnvironment.self) private var appEnvironment
 
     init(
         eventKitService: EventKitSyncService,
@@ -82,6 +83,7 @@ struct FullCalendarView: View {
     @State private var pendingSheet: CalendarSheet?
     @State private var isMonthPickerPresented: Bool = false
     @State private var showCoworker: Bool = false
+    @State private var showCoworkerPaywall: Bool = false
 
     var body: some View {
         VStack {
@@ -99,6 +101,9 @@ struct FullCalendarView: View {
         .navigationDestination(isPresented: $showCoworker) {
             CoworkerView()
         }
+        .sheet(isPresented: $showCoworkerPaywall) {
+            CustomPaywallView()
+        }
         .fontDesign(.serif)
         .yoteiDelegate(viewModel)
         .navigationBarTitleDisplayMode(.inline)
@@ -108,7 +113,11 @@ struct FullCalendarView: View {
             }
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
-                    showCoworker = true
+                    if appEnvironment.revenueCatService.isSubscribed || appEnvironment.revenueCatService.isVIP {
+                        showCoworker = true
+                    } else {
+                        showCoworkerPaywall = true
+                    }
                 } label: {
                     Image(systemName: "person.2.fill")
                 }

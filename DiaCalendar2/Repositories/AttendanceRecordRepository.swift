@@ -23,6 +23,31 @@ actor AttendanceRecordRepository {
         return (try? modelContext.fetch(FetchDescriptor(predicate: predicate)).first)?.toDTO()
     }
 
+    /// 백업용: 전체 조회.
+    func all() -> [AttendanceRecordDTO] {
+        ((try? modelContext.fetch(FetchDescriptor<AttendanceRecord>())) ?? []).map { $0.toDTO() }
+    }
+
+    /// 복원용: 기존 데이터를 모두 지우고 DTO의 필드(category/groupId/createdAt 포함)를 그대로 insert.
+    func restoreAll(_ dtos: [AttendanceRecordDTO]) {
+        if let existing = try? modelContext.fetch(FetchDescriptor<AttendanceRecord>()) {
+            for r in existing { modelContext.delete(r) }
+        }
+        for dto in dtos {
+            modelContext.insert(AttendanceRecord(
+                date: dto.date,
+                attendanceTypeId: dto.attendanceTypeId,
+                name: dto.name,
+                shortName: dto.shortName,
+                originalShiftName: dto.originalShiftName,
+                groupId: dto.groupId,
+                createdAt: dto.createdAt,
+                category: dto.category
+            ))
+        }
+        try? modelContext.save()
+    }
+
     /// `startDate`부터 `days` 일간 같은 휴가를 등록. 회전 없이 모든 날 동일한 name/shortName.
     /// 같은 날짜에 이미 휴가가 있으면 덮어쓰기. groupId로 묶음.
     func createRun(

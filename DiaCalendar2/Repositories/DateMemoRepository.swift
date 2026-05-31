@@ -46,6 +46,19 @@ actor DateMemoRepository {
         return try? modelContext.fetch(FetchDescriptor(predicate: predicate)).first?.toDTO()
     }
 
+    /// 백업용: 전체 조회(반복 메모 포함).
+    func all() -> [DateMemoDTO] {
+        ((try? modelContext.fetch(FetchDescriptor<DateMemo>())) ?? []).map { $0.toDTO() }
+    }
+
+    /// 복원용: 모든 메모 삭제.
+    func deleteAll() {
+        if let existing = try? modelContext.fetch(FetchDescriptor<DateMemo>()) {
+            for m in existing { modelContext.delete(m) }
+            try? modelContext.save()
+        }
+    }
+
     @discardableResult
     func upsert(_ dto: DateMemoDTO) -> DateMemoDTO? {
         let recurrenceData = dto.recurrence.flatMap { try? JSONEncoder().encode($0) }

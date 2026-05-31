@@ -43,4 +43,12 @@ actor CustomShiftRepository {
             try? modelContext.save()
         }
     }
+
+    /// 복원용: 모든 커스텀 근무 삭제.
+    func deleteAll() {
+        if let existing = try? modelContext.fetch(FetchDescriptor<CustomShift>()) {
+            for r in existing { modelContext.delete(r) }
+            try? modelContext.save()
+        }
+    }
 }

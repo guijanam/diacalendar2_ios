@@ -74,4 +74,12 @@ actor AttendanceTypeRepository {
             try? modelContext.save()
         }
     }
+
+    /// 복원용: 모든 근태 유형 삭제.
+    func deleteAll() {
+        if let existing = try? modelContext.fetch(FetchDescriptor<AttendanceType>()) {
+            for r in existing { modelContext.delete(r) }
+            try? modelContext.save()
+        }
+    }
 }
