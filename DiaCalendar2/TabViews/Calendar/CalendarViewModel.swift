@@ -893,6 +893,8 @@ extension FullCalendarViewModelModel: YoteiDelegate<EventData> {
     }
 
     func calendarDidSelectMonthDay(date: Date) {
+        // 탭한 날짜를 포커스로 설정해야 셀에 선택 색이 표시된다(시트를 닫아도 유지).
+        focusedDate = date
         presentedSheet = .dayDetail(calendar.startOfDay(for: date))
     }
 

@@ -312,8 +312,8 @@ struct DayDetailSheet: View {
 
                 Divider()
                 HStack(spacing: 12) {
-                    officeWebSourceButton(title: "기본", source: .primary, isEnabled: configuredOfficeURL != nil)
-                    officeWebSourceButton(title: "보조", source: .secondary, isEnabled: secondaryOfficeURL != nil)
+                    officeWebSourceButton(title: "Day", source: .primary, isEnabled: configuredOfficeURL != nil)
+                    officeWebSourceButton(title: "Month", source: .secondary, isEnabled: secondaryOfficeURL != nil)
                 }
                 .padding(.horizontal, 16)
                 .padding(.top, 10)
@@ -377,7 +377,7 @@ struct DayDetailSheet: View {
                     childSheet = .attendance
                 }
                 if configuredOfficeURL != nil {
-                    actionButton(title: "승무소웹", systemImage: "safari") {
+                    actionButton(title: "근무자", systemImage: "safari") {
                         handleOfficeWebTap()
                     }
                 }

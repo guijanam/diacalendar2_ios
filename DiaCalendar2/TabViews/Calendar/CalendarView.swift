@@ -152,7 +152,7 @@ struct FullCalendarView: View {
                     Button(action: {
                         viewModel.viewDidSelectTimezoneSelector()
                     }) {
-                        Label("방문", systemImage: "globe")
+                        Label("사이트", systemImage: "globe")
                     }
                 } label: {
                     Image(systemName: "ellipsis.circle")

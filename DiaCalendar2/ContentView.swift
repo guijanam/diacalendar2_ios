@@ -93,6 +93,17 @@ struct ContentView: View {
         }
         .animation(.easeInOut, value: appEnvironment.appUpdateService.isUpdateRequired)
         .paywallGate(.usageLimited)
+        .sheet(isPresented: subscriptionPaywallBinding) {
+            CustomPaywallView()
+        }
+    }
+
+    /// 위젯 잠금 탭(diacalendar://subscribe)으로 띄우는 구독 페이월 바인딩.
+    private var subscriptionPaywallBinding: Binding<Bool> {
+        Binding(
+            get: { appEnvironment.showSubscriptionPaywall },
+            set: { appEnvironment.showSubscriptionPaywall = $0 }
+        )
     }
 }
 

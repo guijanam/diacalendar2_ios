@@ -58,6 +58,9 @@ struct DiaCalendar2App: App {
             ContentView()
                 .environment(environment)
                 .preferredColorScheme(AppearanceMode(rawValue: appearanceRaw)?.colorScheme)
+                .onOpenURL { url in
+                    environment.handleDeepLink(url)
+                }
         }
         .modelContainer(modelContainer)
         .onChange(of: scenePhase) { _, phase in

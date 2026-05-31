@@ -6,6 +6,7 @@
 import Observation
 import RevenueCat
 import UIKit
+import WidgetKit
 
 @Observable
 @MainActor
@@ -13,8 +14,12 @@ final class RevenueCatService {
 
     // MARK: - Public State
 
-    private(set) var isSubscribed: Bool = false
-    private(set) var isVIP: Bool = false
+    private(set) var isSubscribed: Bool = false {
+        didSet { syncWidgetState() }
+    }
+    private(set) var isVIP: Bool = false {
+        didSet { syncWidgetState() }
+    }
     private(set) var isLoading: Bool = false
     private(set) var restoreError: String? = nil
 
@@ -33,6 +38,20 @@ final class RevenueCatService {
     func configure() {
         Purchases.configure(withAPIKey: Self.apiKey)
         Purchases.logLevel = .warn
+        // 구독 상태가 기본값(false)에서 변하지 않는 비구독자도 App Group 플래그가
+        // 최소 1회 기록되도록 초기 동기화를 강제한다(didSet은 값이 바뀔 때만 발화).
+        syncWidgetState()
+    }
+
+    // MARK: - Widget State Mirroring
+
+    /// 구독/VIP 상태를 App Group으로 미러링하고 위젯 타임라인을 갱신한다.
+    /// `isSubscribed`/`isVIP`의 didSet에서 호출되어 상태 변경 시 자동 반영된다.
+    private func syncWidgetState() {
+        let unlocked = isSubscribed || isVIP
+        guard SharedSubscriptionState.widgetUnlocked != unlocked else { return }
+        SharedSubscriptionState.widgetUnlocked = unlocked
+        WidgetCenter.shared.reloadAllTimelines()
     }
 
     // MARK: - Subscription Check

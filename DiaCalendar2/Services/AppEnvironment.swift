@@ -61,8 +61,13 @@ final class AppEnvironment {
     // 로컬 알림
     let localNotificationService: LocalNotificationService
 
+    /// 위젯의 잠금 안내 탭(diacalendar://subscribe) 등으로 구독 페이월을 띄워야 할 때 true.
+    /// ContentView가 이 값을 sheet 바인딩으로 사용한다.
+    var showSubscriptionPaywall: Bool = false
+
     @ObservationIgnored private var ekChangeObserver: AnyCancellable?
     @ObservationIgnored private var pendingChangeWorkItem: DispatchWorkItem?
+    @ObservationIgnored private var widgetRefreshObservers: [AnyCancellable] = []
 
     init(modelContainer: ModelContainer) {
         self.workShiftRepository = WorkShiftRepository(modelContainer: modelContainer)
@@ -122,6 +127,9 @@ final class AppEnvironment {
         Task { await localNotificationService.requestAuthorization() }
 
         observeEventKitChanges()
+        observeWidgetDataChanges()
+        // 앱 시작 시 위젯 데이터 1회 생성.
+        regenerateWidgetData()
     }
 
     func onForeground() {
@@ -129,6 +137,36 @@ final class AppEnvironment {
         Task { await appUpdateService.checkForUpdate() }
         Task { await revenueCatService.checkSubscription() }
         Task { await revenueCatService.checkVIP() }
+        // 포그라운드 복귀 시 위젯 데이터 갱신(날짜 경과·외부 변경 반영).
+        regenerateWidgetData()
+    }
+
+    /// 위젯 등에서 들어온 딥링크(diacalendar://...)를 처리한다.
+    func handleDeepLink(_ url: URL) {
+        guard url.scheme == "diacalendar" else { return }
+        switch url.host {
+        case "subscribe":
+            // 이미 구독/VIP면 페이월을 띄울 필요 없음.
+            guard !revenueCatService.isSubscribed, !revenueCatService.isVIP else { return }
+            showSubscriptionPaywall = true
+        default:
+            break
+        }
+    }
+
+    /// 근무/공휴일 변경 알림을 받아 위젯 데이터를 재생성한다.
+    private func observeWidgetDataChanges() {
+        let names: [Notification.Name] = [.shiftScheduleDidUpdate, .holidaysDidUpdate, .ekChangesDidPropagate]
+        widgetRefreshObservers = names.map { name in
+            NotificationCenter.default
+                .publisher(for: name)
+                .receive(on: DispatchQueue.main)
+                .sink { [weak self] _ in self?.regenerateWidgetData() }
+        }
+    }
+
+    private func regenerateWidgetData() {
+        Task { await WidgetDataGenerator.generateAndSave(using: self) }
     }
 
     private func observeEventKitChanges() {
