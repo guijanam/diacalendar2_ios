@@ -21,9 +21,10 @@ struct DiaCalendar2App: App {
 
     init() {
         UNUserNotificationCenter.current().delegate = notificationDelegate
-        
-        
-        
+        PhoneWatchConnectivity.shared.activate()
+
+
+
         let schema = Schema([
             WorkShift.self,
             DateMemo.self,

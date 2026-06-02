@@ -9,6 +9,7 @@
 //
 
 import SwiftUI
+import Combine
 
 struct TrainPositionSheet: View {
     let line: Int
@@ -25,6 +26,13 @@ struct TrainPositionSheet: View {
         case failed(String)
     }
     @State private var state: LoadState = .loading
+
+    /// 자동 새로고침 주기(초).
+    private let autoRefreshInterval = 20
+    /// 다음 자동 새로고침까지 남은 초.
+    @State private var countdown = 20
+    /// 1초마다 카운트다운을 진행시키는 타이머.
+    private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     var body: some View {
         NavigationStack {
@@ -48,7 +56,12 @@ struct TrainPositionSheet: View {
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button { Task { await load() } } label: {
-                        Image(systemName: "arrow.clockwise")
+                        HStack(spacing: 4) {
+                            Image(systemName: "arrow.clockwise")
+                            Text("\(countdown)")
+                                .font(.subheadline.monospacedDigit())
+                                .foregroundStyle(.secondary)
+                        }
                     }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
@@ -56,6 +69,15 @@ struct TrainPositionSheet: View {
                 }
             }
             .task { await load() }
+            .onReceive(timer) { _ in
+                // 조회 중에는 카운트다운을 멈추고 대기.
+                if case .loading = state { return }
+                if countdown > 1 {
+                    countdown -= 1
+                } else {
+                    Task { await load() }
+                }
+            }
         }
     }
 
@@ -143,6 +165,7 @@ struct TrainPositionSheet: View {
     @MainActor
     private func load() async {
         state = .loading
+        defer { countdown = autoRefreshInterval }  // 조회 종료 후 카운트다운 리셋
         do {
             let all = try await SeoulSubwayAPI.realtimePositions(line: line)
             let selected = selectTrains(in: all)

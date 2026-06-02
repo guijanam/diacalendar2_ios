@@ -14,6 +14,8 @@ final class DateMemo {
     var colorHex: String
     var startDate: Date
     var endDate: Date
+    /// 데이터베이스에 메모가 처음 생성된 시각. 기존 데이터 마이그레이션을 위해 기본값을 둔다.
+    var createdAt: Date = Date()
     var updatedAt: Date
     var isDone: Bool
     var recurrenceData: Data?
@@ -25,6 +27,7 @@ final class DateMemo {
         colorHex: String,
         startDate: Date,
         endDate: Date,
+        createdAt: Date = Date(),
         updatedAt: Date = Date(),
         isDone: Bool = false,
         recurrenceData: Data? = nil
@@ -35,6 +38,7 @@ final class DateMemo {
         self.colorHex = colorHex
         self.startDate = startDate
         self.endDate = endDate
+        self.createdAt = createdAt
         self.updatedAt = updatedAt
         self.isDone = isDone
         self.recurrenceData = recurrenceData
@@ -49,6 +53,7 @@ final class DateMemo {
             colorHex: colorHex,
             startDate: startDate,
             endDate: endDate,
+            createdAt: createdAt,
             updatedAt: updatedAt,
             isDone: isDone,
             recurrence: recurrence

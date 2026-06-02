@@ -83,6 +83,7 @@ actor DateMemoRepository {
                 colorHex: dto.colorHex,
                 startDate: dto.startDate,
                 endDate: dto.endDate,
+                createdAt: dto.createdAt,
                 isDone: dto.isDone,
                 recurrenceData: recurrenceData
             )

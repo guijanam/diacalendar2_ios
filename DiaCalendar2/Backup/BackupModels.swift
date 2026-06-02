@@ -236,6 +236,7 @@ struct BackupMemo: Codable {
     var colorHex: String
     var startDate: Date
     var endDate: Date
+    var createdAt: Date?
     var updatedAt: Date
     var isDone: Bool
     var recurrence: EventRecurrence?    // 이미 Codable
@@ -247,6 +248,7 @@ struct BackupMemo: Codable {
         colorHex = dto.colorHex
         startDate = dto.startDate
         endDate = dto.endDate
+        createdAt = dto.createdAt
         updatedAt = dto.updatedAt
         isDone = dto.isDone
         recurrence = dto.recurrence
@@ -260,6 +262,8 @@ struct BackupMemo: Codable {
             colorHex: colorHex,
             startDate: startDate,
             endDate: endDate,
+            // 구버전 백업에는 createdAt이 없으므로 updatedAt으로 대체.
+            createdAt: createdAt ?? updatedAt,
             updatedAt: updatedAt,
             isDone: isDone,
             recurrence: recurrence

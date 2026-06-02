@@ -12,6 +12,8 @@ struct DateMemoDTO: Sendable, Identifiable, Equatable {
     var colorHex: String
     var startDate: Date
     var endDate: Date
+    /// 데이터베이스에 메모가 처음 생성된 시각.
+    var createdAt: Date = Date()
     var updatedAt: Date
     var isDone: Bool
     var recurrence: EventRecurrence?

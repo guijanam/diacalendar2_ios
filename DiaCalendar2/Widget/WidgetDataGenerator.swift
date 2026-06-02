@@ -137,6 +137,14 @@ enum WidgetDataGenerator {
         } catch {
             // 저장 실패는 무시(다음 호출에서 재시도).
         }
+
+        // 7. 오늘 근무를 워치로 전송. (App Group 은 워치와 공유되지 않으므로 WCSession 사용)
+        let watchPayload = WatchShiftPayload(
+            date: today,
+            dia: todayTurn.isEmpty ? "근무없음" : todayTurn,
+            workTime: workTime(forTurn: todayTurn, on: today)
+        )
+        PhoneWatchConnectivity.shared.sendTodayShift(watchPayload)
     }
 
     /// 같은 diaId 후보 중 오늘+다음날 요일 조합에 맞는 row 선택.

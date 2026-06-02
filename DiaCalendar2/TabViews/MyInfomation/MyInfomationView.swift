@@ -228,10 +228,16 @@ struct MyInfomationView: View {
 
             Spacer(minLength: 0)
 
-            if memo.isDone {
-                Image(systemName: "checkmark.circle.fill")
-                    .foregroundStyle(.green)
-                    .font(.title3)
+            VStack(alignment: .trailing, spacing: 6) {
+                if memo.isDone {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundStyle(.green)
+                        .font(.title3)
+                }
+                Text(createdDateString(memo.createdAt))
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.trailing)
             }
         }
         .padding(12)
@@ -429,6 +435,16 @@ struct MyInfomationView: View {
         formatter.calendar = calendar
         formatter.timeZone = calendar.timeZone
         formatter.dateFormat = "yyyy년 M월 d일 (E)"
+        formatter.locale = Locale(identifier: "ko_KR")
+        return formatter.string(from: date)
+    }
+
+    /// 메모가 데이터베이스에 생성된 날짜.
+    private func createdDateString(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.calendar = calendar
+        formatter.timeZone = calendar.timeZone
+        formatter.dateFormat = "yyyy.MM.dd HH:mm"
         formatter.locale = Locale(identifier: "ko_KR")
         return formatter.string(from: date)
     }
