@@ -16,7 +16,7 @@ struct ContentView: View {
     }
 
     var body: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 3) {
             if let shift = connectivity.todayShift {
                 Text(dateTitle(shift.date))
                     .font(.caption2)
@@ -38,15 +38,15 @@ struct ContentView: View {
                 }
 
                 if hasHalfDetail(shift) {
-                    VStack(spacing: 4) {
+                    VStack(spacing: 2) {
                         if !shift.firstTime.isEmpty || !shift.numTr1.isEmpty {
-                            halfRow(label: "전반", train: shift.numTr1, time: shift.firstTime)
+                            halfBlock(train: shift.numTr1, time: shift.firstTime, color: .cyan)
                         }
                         if !shift.secondTime.isEmpty || !shift.numTr2.isEmpty {
-                            halfRow(label: "후반", train: shift.numTr2, time: shift.secondTime)
+                            halfBlock(train: shift.numTr2, time: shift.secondTime, color: .orange)
                         }
                     }
-                    .padding(.top, 2)
+                    .padding(.top, 1)
                 }
 
                 if !isToday {
@@ -63,8 +63,11 @@ struct ContentView: View {
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
             }
+            Spacer(minLength: 0)
         }
-        .padding()
+        .frame(maxHeight: .infinity, alignment: .top)
+        .padding(.horizontal)
+        .padding(.vertical, 2)
     }
 
     /// 전반/후반 중 하나라도 표시할 내용이 있는지.
@@ -73,22 +76,20 @@ struct ContentView: View {
             || !shift.numTr2.isEmpty || !shift.secondTime.isEmpty
     }
 
-    /// 전반/후반 한 줄: "전반  2204  06:30" 형태.
+    /// 전반/후반 한 묶음: 열번(작게) 위, 시간(크게) 아래로 한 줄씩, 색으로 구분(전반=cyan, 후반=orange).
     @ViewBuilder
-    private func halfRow(label: String, train: String, time: String) -> some View {
-        HStack(spacing: 6) {
-            Text(label)
-                .font(.caption2)
-                .foregroundStyle(.secondary)
+    private func halfBlock(train: String, time: String, color: Color) -> some View {
+        VStack(spacing: 0) {
             if !train.isEmpty {
                 Text(train)
-                    .font(.caption)
+                    .font(.caption2)
                     .fontWeight(.semibold)
+                    .foregroundStyle(color)
             }
             if !time.isEmpty {
                 Text(time)
-                    .font(.caption)
-                    .foregroundStyle(.tint)
+                    .font(.headline)
+                    .foregroundStyle(color)
             }
         }
         .minimumScaleFactor(0.6)
