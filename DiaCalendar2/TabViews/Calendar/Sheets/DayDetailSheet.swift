@@ -52,6 +52,7 @@ struct DayDetailSheet: View {
         case attendance
         case lunarAnniversaryEditor(LunarAnniversaryEditorMode)
         case trainPosition(line: Int, myTrainNo: String, previousTrainNo: String?)
+        case cafeteria
 
         var id: String {
             switch self {
@@ -63,11 +64,14 @@ struct DayDetailSheet: View {
             case .lunarAnniversaryEditor(.new(let m, let d)): return "lunar-new-\(m)-\(d)"
             case .lunarAnniversaryEditor(.edit(let dto)): return "lunar-edit-\(dto.id.uuidString)"
             case .trainPosition(let line, let my, let prev): return "train-\(line)-\(my)-\(prev ?? "")"
+            case .cafeteria: return "cafeteria"
             }
         }
     }
 
     @State private var childSheet: DayChildSheet?
+    /// FAB(식단·근무자) 펼침 여부.
+    @State private var isFabExpanded = false
 
     @State private var memos: [DateMemoDTO] = []
     @State private var lunarAnniversaries: [LunarAnniversaryDTO] = []
@@ -97,6 +101,7 @@ struct DayDetailSheet: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
+              ZStack(alignment: .bottomTrailing) {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 20) {
                         if let info = shiftInfo {
@@ -160,6 +165,9 @@ struct DayDetailSheet: View {
                     .padding(16)
                 }
                 .background(Color(.systemGroupedBackground))
+
+                fabStack
+              }
 
                 actionBar
             }
@@ -376,17 +384,83 @@ struct DayDetailSheet: View {
                 actionButton(title: "근태(휴가)", systemImage: "tag") {
                     childSheet = .attendance
                 }
-                if configuredOfficeURL != nil {
-                    actionButton(title: "근무자", systemImage: "safari") {
-                        handleOfficeWebTap()
-                    }
-                }
             }
             .padding(.horizontal, 16)
             .padding(.top, 12)
             .padding(.bottom, 8)
         }
         .background(.bar)
+    }
+
+    // MARK: - 플로팅 버튼 (식단 · 근무자)
+
+    @ViewBuilder
+    private var fabStack: some View {
+        VStack(alignment: .trailing, spacing: 12) {
+            if isFabExpanded {
+                // 근무자는 승무소 URL이 설정된 경우에만 노출.
+                if configuredOfficeURL != nil {
+                    fabMenuItem(title: "근무자", systemImage: "safari") {
+                        collapseFab()
+                        handleOfficeWebTap()
+                    }
+                }
+                fabMenuItem(title: "식단", systemImage: "fork.knife.circle") {
+                    collapseFab()
+                    childSheet = .cafeteria
+                }
+            }
+
+            Button {
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                    isFabExpanded.toggle()
+                }
+            } label: {
+                Image(systemName: "plus")
+                    .font(.system(size: 22, weight: .semibold))
+                    .foregroundColor(.white)
+                    .frame(width: 56, height: 56)
+                    .background(Color.accentColor)
+                    .clipShape(Circle())
+                    .shadow(color: Color.black.opacity(0.25), radius: 6, x: 0, y: 3)
+                    .rotationEffect(.degrees(isFabExpanded ? 45 : 0))
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(isFabExpanded ? "닫기" : "더보기")
+        }
+        .padding(.trailing, 20)
+        .padding(.bottom, 20)
+    }
+
+    @ViewBuilder
+    private func fabMenuItem(
+        title: String,
+        systemImage: String,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            HStack(spacing: 8) {
+                Text(title)
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+                Image(systemName: systemImage)
+                    .font(.system(size: 18, weight: .semibold))
+            }
+            .foregroundColor(.accentColor)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .background(Color(.secondarySystemGroupedBackground))
+            .clipShape(Capsule())
+            .shadow(color: Color.black.opacity(0.18), radius: 5, x: 0, y: 2)
+        }
+        .buttonStyle(.plain)
+        .transition(.move(edge: .trailing).combined(with: .opacity))
+    }
+
+    private func collapseFab() {
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+            isFabExpanded = false
+        }
     }
 
     @ViewBuilder
@@ -650,6 +724,8 @@ struct DayDetailSheet: View {
             )
         case .trainPosition(let line, let my, let prev):
             TrainPositionSheet(line: line, myTrainNo: my, previousTrainNo: prev)
+        case .cafeteria:
+            CafeteriaMenuSheet(date: date, calendar: calendar)
         }
     }
 
