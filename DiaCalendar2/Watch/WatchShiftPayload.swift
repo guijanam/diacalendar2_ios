@@ -18,6 +18,14 @@ struct WatchShiftPayload: Codable, Equatable {
     let dia: String
     /// 근무 시간 문자열. 없으면 빈 문자열.
     let workTime: String
+    /// 전반 열번. 없으면 빈 문자열.
+    let numTr1: String
+    /// 전반 시간. 없으면 빈 문자열.
+    let firstTime: String
+    /// 후반 열번. 없으면 빈 문자열.
+    let numTr2: String
+    /// 후반 시간. 없으면 빈 문자열.
+    let secondTime: String
 
     /// transferUserInfo 가 받는 [String: Any] 로 변환.
     func toUserInfo() -> [String: Any] {
@@ -25,7 +33,11 @@ struct WatchShiftPayload: Codable, Equatable {
             WatchPayloadKeys.kind: WatchPayloadKeys.todayShiftKind,
             WatchPayloadKeys.date: date.timeIntervalSince1970,
             WatchPayloadKeys.dia: dia,
-            WatchPayloadKeys.workTime: workTime
+            WatchPayloadKeys.workTime: workTime,
+            WatchPayloadKeys.numTr1: numTr1,
+            WatchPayloadKeys.firstTime: firstTime,
+            WatchPayloadKeys.numTr2: numTr2,
+            WatchPayloadKeys.secondTime: secondTime
         ]
     }
 
@@ -40,12 +52,27 @@ struct WatchShiftPayload: Codable, Equatable {
         self.date = Date(timeIntervalSince1970: ts)
         self.dia = dia
         self.workTime = workTime
+        // 신규 필드는 구버전 페이로드 호환을 위해 누락 시 빈 문자열.
+        self.numTr1 = userInfo[WatchPayloadKeys.numTr1] as? String ?? ""
+        self.firstTime = userInfo[WatchPayloadKeys.firstTime] as? String ?? ""
+        self.numTr2 = userInfo[WatchPayloadKeys.numTr2] as? String ?? ""
+        self.secondTime = userInfo[WatchPayloadKeys.secondTime] as? String ?? ""
     }
 
-    init(date: Date, dia: String, workTime: String) {
+    init(date: Date,
+         dia: String,
+         workTime: String,
+         numTr1: String = "",
+         firstTime: String = "",
+         numTr2: String = "",
+         secondTime: String = "") {
         self.date = date
         self.dia = dia
         self.workTime = workTime
+        self.numTr1 = numTr1
+        self.firstTime = firstTime
+        self.numTr2 = numTr2
+        self.secondTime = secondTime
     }
 }
 
@@ -55,6 +82,10 @@ enum WatchPayloadKeys {
     static let date = "date"
     static let dia = "dia"
     static let workTime = "workTime"
+    static let numTr1 = "numTr1"
+    static let firstTime = "firstTime"
+    static let numTr2 = "numTr2"
+    static let secondTime = "secondTime"
 
     /// 워치가 마지막 수신 페이로드를 캐시해 두는 UserDefaults 키(워치 측 자체 저장소).
     static let cachedPayloadDefaultsKey = "watch.cachedTodayShift"

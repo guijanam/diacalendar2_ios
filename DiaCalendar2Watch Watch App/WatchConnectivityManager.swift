@@ -29,6 +29,11 @@ final class WatchConnectivityManager: NSObject, ObservableObject {
         let session = WCSession.default
         session.delegate = self
         session.activate()
+        // 이미 폰이 보내둔 application context가 있으면 활성화 직후 즉시 반영.
+        if !session.receivedApplicationContext.isEmpty,
+           let payload = WatchShiftPayload(userInfo: session.receivedApplicationContext) {
+            apply(payload)
+        }
     }
 
     // MARK: - Cache
@@ -62,6 +67,13 @@ extension WatchConnectivityManager: WCSessionDelegate {
     /// transferUserInfo 로 도착한 오늘 근무 수신.
     func session(_ session: WCSession, didReceiveUserInfo userInfo: [String: Any] = [:]) {
         if let payload = WatchShiftPayload(userInfo: userInfo) {
+            apply(payload)
+        }
+    }
+
+    /// updateApplicationContext 로 도착한 오늘 근무 수신(최신 상태 동기화).
+    func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String: Any]) {
+        if let payload = WatchShiftPayload(userInfo: applicationContext) {
             apply(payload)
         }
     }

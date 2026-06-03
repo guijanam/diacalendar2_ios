@@ -28,17 +28,22 @@ final class PhoneWatchConnectivity: NSObject {
         session.activate()
     }
 
-    /// 오늘 근무를 워치로 전송한다. (transferUserInfo: 큐 기반 → 워치 미실행 중에도 다음 기회에 도착)
+    /// 오늘 근무를 워치로 전송한다.
+    /// - updateApplicationContext: "마지막 상태"를 덮어써 워치가 나중에 켜져도 즉시 최신값을 받는다(가장 신뢰도 높음).
+    /// - transferUserInfo: 큐 기반 백업 경로(워치 미실행 중에도 다음 기회에 도착).
     func sendTodayShift(_ payload: WatchShiftPayload) {
         guard WCSession.isSupported() else { return }
         let session = WCSession.default
 
         switch session.activationState {
         case .activated:
-            // 폰과 페어링된 워치 앱이 설치된 경우에만 전송 시도.
-            if session.isPaired && session.isWatchAppInstalled {
-                session.transferUserInfo(payload.toUserInfo())
-            }
+            // 페어링된 워치 앱이 설치된 경우에만 전송 시도.
+            guard session.isPaired && session.isWatchAppInstalled else { return }
+            let info = payload.toUserInfo()
+            // 1순위: application context (항상 최신 1건 보장).
+            try? session.updateApplicationContext(info)
+            // 2순위: 큐 전송(앱 컨텍스트가 지원 안 되는 상황 대비).
+            session.transferUserInfo(info)
         default:
             // 아직 비활성: 활성화 후 보내도록 보관하고 activate 트리거.
             pendingPayload = payload

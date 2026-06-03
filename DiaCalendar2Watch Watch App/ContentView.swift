@@ -22,17 +22,31 @@ struct ContentView: View {
                     .font(.caption2)
                     .foregroundStyle(.secondary)
 
-                Text(shift.dia)
-                    .font(.system(size: 34, weight: .bold, design: .rounded))
-                    .minimumScaleFactor(0.5)
-                    .lineLimit(1)
-
-                if !shift.workTime.isEmpty {
-                    Text(shift.workTime)
-                        .font(.headline)
-                        .foregroundStyle(.tint)
-                        .minimumScaleFactor(0.6)
+                HStack(alignment: .firstTextBaseline, spacing: 6) {
+                    Text(shift.dia)
+                        .font(.system(size: 24, weight: .bold, design: .rounded))
+                        .minimumScaleFactor(0.5)
                         .lineLimit(1)
+
+                    if !shift.workTime.isEmpty {
+                        Text(shift.workTime)
+                            .font(.headline)
+                            .foregroundStyle(.tint)
+                            .minimumScaleFactor(0.6)
+                            .lineLimit(1)
+                    }
+                }
+
+                if hasHalfDetail(shift) {
+                    VStack(spacing: 4) {
+                        if !shift.firstTime.isEmpty || !shift.numTr1.isEmpty {
+                            halfRow(label: "전반", train: shift.numTr1, time: shift.firstTime)
+                        }
+                        if !shift.secondTime.isEmpty || !shift.numTr2.isEmpty {
+                            halfRow(label: "후반", train: shift.numTr2, time: shift.secondTime)
+                        }
+                    }
+                    .padding(.top, 2)
                 }
 
                 if !isToday {
@@ -51,6 +65,34 @@ struct ContentView: View {
             }
         }
         .padding()
+    }
+
+    /// 전반/후반 중 하나라도 표시할 내용이 있는지.
+    private func hasHalfDetail(_ shift: WatchShiftPayload) -> Bool {
+        !shift.numTr1.isEmpty || !shift.firstTime.isEmpty
+            || !shift.numTr2.isEmpty || !shift.secondTime.isEmpty
+    }
+
+    /// 전반/후반 한 줄: "전반  2204  06:30" 형태.
+    @ViewBuilder
+    private func halfRow(label: String, train: String, time: String) -> some View {
+        HStack(spacing: 6) {
+            Text(label)
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+            if !train.isEmpty {
+                Text(train)
+                    .font(.caption)
+                    .fontWeight(.semibold)
+            }
+            if !time.isEmpty {
+                Text(time)
+                    .font(.caption)
+                    .foregroundStyle(.tint)
+            }
+        }
+        .minimumScaleFactor(0.6)
+        .lineLimit(1)
     }
 
     private func dateTitle(_ date: Date) -> String {

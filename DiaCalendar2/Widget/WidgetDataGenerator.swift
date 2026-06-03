@@ -139,10 +139,19 @@ enum WidgetDataGenerator {
         }
 
         // 7. 오늘 근무를 워치로 전송. (App Group 은 워치와 공유되지 않으므로 WCSession 사용)
+        //    전반/후반 열번·시간까지 보내기 위해 오늘 dia 레코드를 한 번 선택한다.
+        let todayDiaRecord: DiaRecordDTO? = {
+            guard !todayTurn.isEmpty, let candidates = diasByTurn[todayTurn] else { return nil }
+            return pickBestDia(candidates, for: today, holidayDayKeys: holidayDayKeys)
+        }()
         let watchPayload = WatchShiftPayload(
             date: today,
             dia: todayTurn.isEmpty ? "근무없음" : todayTurn,
-            workTime: workTime(forTurn: todayTurn, on: today)
+            workTime: todayDiaRecord?.workTime ?? "",
+            numTr1: todayDiaRecord?.numTr1 ?? "",
+            firstTime: todayDiaRecord?.firstTime ?? "",
+            numTr2: todayDiaRecord?.numTr2 ?? "",
+            secondTime: todayDiaRecord?.secondTime ?? ""
         )
         PhoneWatchConnectivity.shared.sendTodayShift(watchPayload)
     }
