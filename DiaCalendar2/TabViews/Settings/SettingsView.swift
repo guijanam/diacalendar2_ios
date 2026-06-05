@@ -70,7 +70,7 @@ struct SettingsView: View {
                     }
                 }
 
-                Section("근무 설정") {
+                Section {
                     NavigationLink {
                         ShiftSetupView()
                     } label: {
@@ -91,6 +91,16 @@ struct SettingsView: View {
                         AttendanceTypeListView()
                     } label: {
                         Label("근태 편집", systemImage: "tag")
+                    }
+                } header: {
+                    HStack {
+                        Text("근무 설정")
+                        Spacer()
+                        if let url = URL(string: "https://diacalendar.co.kr") {
+                            Link("Dia관리", destination: url)
+                                .font(.caption)
+                                .textCase(nil)
+                        }
                     }
                 }
 
